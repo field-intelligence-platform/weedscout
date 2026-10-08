@@ -30,11 +30,15 @@ TIER_LABELS = {
 class Settings:
     min_clear_fraction: float = 0.8  # share of the field that must be cloud-free on a date
     min_canopy_ndvi: float = 0.4  # field median; below this the crop is not up (or is harvested)
-    z_threshold: float = -1.5  # robust z-score versus the field on that date
-    min_relative_deficit: float = 0.10  # and at least 10 % below the field median
+    # Anomaly and persistence thresholds were chosen by rule, not by hand: the setting
+    # that finds the most injected 0.25-1 ha patches (10-20 % NDVI deficit) while keeping
+    # chance false alarms <= 1 % and every real field <= 15 % flagged, in BOTH the 2024
+    # and the held-out 2023 season. See docs/VALIDATION.md and experiments/calibrate.py.
+    z_threshold: float = -1.5  # robust z-score versus the crop unit on that date
+    min_relative_deficit: float = 0.05  # and at least 5 % below the unit median
     min_dates: int = 3  # fewer usable dates -> no tiers at all
-    watch_persistence: float = 0.3
-    scout_persistence: float = 0.6
+    watch_persistence: float = 0.4
+    scout_persistence: float = 0.5
     edge_buffer_m: float = 10.0  # drop boundary pixels mixed with roads/hedges
     min_zone_ha: float = 0.1
 

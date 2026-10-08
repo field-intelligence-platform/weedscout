@@ -1,10 +1,10 @@
 {
   "field_id": "DENILI0465750023",
-  "weedscout_version": "1.0.0",
+  "weedscout_version": "1.1.0",
   "status": "ok",
   "status_reason": "",
   "field_area_ha": 15.73,
-  "analysed_area_ha": 14.23,
+  "analysed_area_ha": 14.05,
   "crs": "EPSG:32632",
   "season": {
     "start": "2024-04-01",
@@ -16,10 +16,10 @@
     "min_clear_fraction": 0.8,
     "min_canopy_ndvi": 0.4,
     "z_threshold": -1.5,
-    "min_relative_deficit": 0.1,
+    "min_relative_deficit": 0.05,
     "min_dates": 3,
-    "watch_persistence": 0.3,
-    "scout_persistence": 0.6,
+    "watch_persistence": 0.4,
+    "scout_persistence": 0.5,
     "edge_buffer_m": 10.0,
     "min_zone_ha": 0.1
   },
@@ -30,7 +30,9 @@
     "crossing_dates": 2,
     "min_dates": 4,
     "min_unit_ha": 1.0,
-    "min_patch_ha": 0.1
+    "min_patch_ha": 0.1,
+    "n_consensus": 7,
+    "min_agreement": 0.8
   },
   "warnings": [],
   "dates": [
@@ -228,8 +230,8 @@
   "units": [
     {
       "unit_id": 1,
-      "area_ha": 14.23,
-      "analysed_ha": 14.23,
+      "area_ha": 14.15,
+      "analysed_ha": 14.05,
       "usable_dates": 14,
       "status": "ok",
       "dates": [
@@ -237,16 +239,16 @@
           "date": "2024-04-08",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.704,
+          "median_ndvi": 0.705,
           "clear_pct": 100.0,
-          "flagged_pct": 12.4
+          "flagged_pct": 18.4
         },
         {
           "date": "2024-04-18",
           "used": false,
-          "reason": "clouds/shadow/snow: only 2% clear",
-          "median_ndvi": 0.671,
-          "clear_pct": 1.8
+          "reason": "clouds/shadow/snow: only 1% clear",
+          "median_ndvi": 0.718,
+          "clear_pct": 1.1
         },
         {
           "date": "2024-04-23",
@@ -254,15 +256,15 @@
           "reason": "ok",
           "median_ndvi": 0.859,
           "clear_pct": 100.0,
-          "flagged_pct": 7.7
+          "flagged_pct": 11.7
         },
         {
           "date": "2024-04-30",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.804,
+          "median_ndvi": 0.805,
           "clear_pct": 100.0,
-          "flagged_pct": 5.8
+          "flagged_pct": 10.2
         },
         {
           "date": "2024-05-05",
@@ -277,7 +279,7 @@
           "reason": "ok",
           "median_ndvi": 0.874,
           "clear_pct": 100.0,
-          "flagged_pct": 2.8
+          "flagged_pct": 7.5
         },
         {
           "date": "2024-05-10",
@@ -285,15 +287,15 @@
           "reason": "ok",
           "median_ndvi": 0.895,
           "clear_pct": 100.0,
-          "flagged_pct": 3.2
+          "flagged_pct": 7.9
         },
         {
           "date": "2024-05-13",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.875,
+          "median_ndvi": 0.876,
           "clear_pct": 100.0,
-          "flagged_pct": 2.1
+          "flagged_pct": 6.3
         },
         {
           "date": "2024-05-15",
@@ -301,7 +303,7 @@
           "reason": "ok",
           "median_ndvi": 0.894,
           "clear_pct": 100.0,
-          "flagged_pct": 2.5
+          "flagged_pct": 6.3
         },
         {
           "date": "2024-05-23",
@@ -309,7 +311,7 @@
           "reason": "ok",
           "median_ndvi": 0.911,
           "clear_pct": 100.0,
-          "flagged_pct": 0.0
+          "flagged_pct": 1.1
         },
         {
           "date": "2024-05-25",
@@ -330,7 +332,7 @@
           "used": false,
           "reason": "clouds/shadow/snow: only 7% clear",
           "median_ndvi": 0.843,
-          "clear_pct": 6.9
+          "clear_pct": 7.0
         },
         {
           "date": "2024-06-09",
@@ -338,7 +340,7 @@
           "reason": "ok",
           "median_ndvi": 0.884,
           "clear_pct": 100.0,
-          "flagged_pct": 0.0
+          "flagged_pct": 1.5
         },
         {
           "date": "2024-06-12",
@@ -372,9 +374,9 @@
           "date": "2024-06-24",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.86,
+          "median_ndvi": 0.859,
           "clear_pct": 100.0,
-          "flagged_pct": 0.1
+          "flagged_pct": 1.3
         },
         {
           "date": "2024-06-27",
@@ -382,23 +384,23 @@
           "reason": "ok",
           "median_ndvi": 0.855,
           "clear_pct": 99.5,
-          "flagged_pct": 0.6
+          "flagged_pct": 2.6
         },
         {
           "date": "2024-06-29",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.751,
+          "median_ndvi": 0.75,
           "clear_pct": 100.0,
-          "flagged_pct": 0.4
+          "flagged_pct": 2.1
         },
         {
           "date": "2024-07-07",
           "used": true,
           "reason": "ok",
-          "median_ndvi": 0.608,
+          "median_ndvi": 0.607,
           "clear_pct": 100.0,
-          "flagged_pct": 0.8
+          "flagged_pct": 4.5
         },
         {
           "date": "2024-07-09",
@@ -406,7 +408,7 @@
           "reason": "ok",
           "median_ndvi": 0.444,
           "clear_pct": 100.0,
-          "flagged_pct": 1.9
+          "flagged_pct": 2.3
         },
         {
           "date": "2024-07-14",
@@ -438,10 +440,10 @@
         }
       ],
       "mean_ndvi_curve": {
-        "2024-04-08": 0.685,
-        "2024-04-23": 0.844,
-        "2024-04-30": 0.794,
-        "2024-05-08": 0.867,
+        "2024-04-08": 0.686,
+        "2024-04-23": 0.845,
+        "2024-04-30": 0.795,
+        "2024-05-08": 0.868,
         "2024-05-10": 0.888,
         "2024-05-13": 0.871,
         "2024-05-15": 0.889,
@@ -449,22 +451,24 @@
         "2024-06-09": 0.883,
         "2024-06-24": 0.858,
         "2024-06-27": 0.854,
-        "2024-06-29": 0.75,
-        "2024-07-07": 0.612,
-        "2024-07-09": 0.453,
-        "2024-07-22": 0.238,
-        "2024-07-29": 0.218
+        "2024-06-29": 0.749,
+        "2024-07-07": 0.611,
+        "2024-07-09": 0.452,
+        "2024-07-22": 0.237,
+        "2024-07-29": 0.217
       }
     }
   ],
+  "uncertain_unit_ha": 0.0,
   "zones": {
-    "scout_first_ha": 0.0,
-    "watch_ha": 0.19,
-    "normal_ha": 14.04,
+    "scout_first_ha": 0.6,
+    "watch_ha": 0.0,
+    "normal_ha": 13.45,
     "unusual_pattern_ha": 0.0,
     "unusual_pattern_count": 0,
-    "scout_first_count": 0,
-    "watch_count": 1,
-    "flagged_share_pct": 1.3
+    "scout_first_count": 3,
+    "watch_count": 0,
+    "scout_first_at_edge_count": 3,
+    "flagged_share_pct": 4.3
   }
 }

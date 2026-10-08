@@ -1,5 +1,7 @@
 # Precision Weed Scouting — where to look first, from Sentinel-2
 
+[![tests](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
+
 **Version 1.0.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: working, not yet ground-truthed
 
 Give it a field-boundary file and a season. It returns a map of the zones that **underperformed the rest of their own crop on most clear-sky dates**, so a farmer, agronomist or drone knows where to walk first.
@@ -34,7 +36,7 @@ pip install -e ".[dev]"
 
 weedscout --boundary data/fields/goettingen_example_fields.geojson \
           --start 2024-04-01 --end 2024-07-31 --out outputs/my_run
-pytest                                                   # 37 offline tests, no network needed
+pytest                                                   # offline tests, no network needed; CI runs them on Linux, Windows and macOS, Python 3.10–3.13
 ```
 
 No API key is needed: imagery comes from the free [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/) STAC API. A run over three fields and one season takes about a minute. The command above reproduces the committed example in [`outputs/example/`](outputs/example/).

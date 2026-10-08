@@ -1,16 +1,17 @@
 # Scouting summary - field DENILI0565200005
 
-- Field area: 37.5 ha (31.7 ha analysed; a 10 m edge buffer and crop-unit borders are excluded)
-- Season: 2024-04-01 to 2024-07-31, 27 Sentinel-2 dates found
-- **Scout first:** 1.64 ha in 4 zone(s) - 4 of them at the field edge, where headland compaction, hedge shading or turning overlaps are common causes
-- **Watch:** 0.34 ha in 3 zone(s)
-- Normal: 29.75 ha
+- Field area: 37.5 ha (31.1 ha analysed; a 10 m edge buffer and crop-unit borders are excluded)
+- Season: 2024-03-01 to 2024-10-31, 52 Sentinel-2 dates found
+- **Scout first:** 0.67 ha in 1 zone(s) - 1 of them at the field edge, where headland compaction, hedge shading or turning overlaps are common causes
+- **Watch:** 0.00 ha in 0 zone(s)
+- Normal: 30.45 ha
+- Unusual seasonal pattern (not scored): 0.68 ha in 3 zone(s)
 
 ## Crop units
 
-- **U1**: 21.7 ha, 10 usable dates
-- **U2**: 11.0 ha, 14 usable dates
-- **U3**: 1.7 ha, 12 usable dates
+- **U1**: 21.2 ha, 21 usable dates; problems weaker than about 5 % below this crop's normal vigour cannot be told apart from its natural patchiness
+- **U2**: 11.0 ha, 14 usable dates; problems weaker than about 5 % below this crop's normal vigour cannot be told apart from its natural patchiness
+- **U3**: 1.7 ha, 11 usable dates; problems weaker than about 5 % below this crop's normal vigour cannot be told apart from its natural patchiness
 
 ## What this means
 
@@ -18,12 +19,18 @@ Zones are parts of a crop unit whose NDVI was clearly below the rest of the same
 
 > Note: This boundary appears to contain 3 different crops (their seasonal NDVI curves cross). Each crop unit is analysed against itself; unit borders are excluded. If this is wrong, the boundary file may not match how the field was sown.
 
-> Note: 0.01 ha could not be assigned to one crop unit with confidence (fewer than 80% of 7 independent splits agreed). It is left unscored (blank on the map).
+> Note: 0.02 ha could not be assigned to one crop unit with confidence (fewer than 80% of 7 independent splits agreed). It is left unscored (blank on the map).
+
+> Note: 0.68 ha has a seasonal NDVI pattern unlike any crop around it (for example green early then bare, or re-greening after harvest). It is shown as 'Unusual seasonal pattern' and not scored, because comparing it with a crop it does not belong to would be meaningless.
 
 ## Dates (median NDVI in brackets)
 
 | date | field clear % | U1 | U2 | U3 |
 |---|---|---|---|---|
+| 2024-03-01 | 71 | no canopy (0.16) | cloud | cloud |
+| 2024-03-04 | 0 | cloud | cloud | cloud |
+| 2024-03-09 | 0 | cloud | cloud | cloud |
+| 2024-03-31 | 0 | cloud | cloud | cloud |
 | 2024-04-08 | 100 | no canopy (0.25) | used (0.66) | used (0.72) |
 | 2024-04-18 | 0 | cloud | cloud | cloud |
 | 2024-04-23 | 0 | cloud | cloud | cloud |
@@ -32,9 +39,9 @@ Zones are parts of a crop unit whose NDVI was clearly below the rest of the same
 | 2024-05-08 | 100 | no canopy (0.18) | used (0.89) | used (0.69) |
 | 2024-05-10 | 100 | no canopy (0.15) | used (0.91) | used (0.71) |
 | 2024-05-13 | 67 | no canopy (0.19) | cloud | cloud |
-| 2024-05-15 | 100 | no canopy (0.18) | used (0.91) | used (0.74) |
+| 2024-05-15 | 100 | no canopy (0.18) | used (0.91) | used (0.75) |
 | 2024-05-23 | 67 | cloud | used (0.89) | used (0.80) |
-| 2024-05-25 | 99 | no canopy (0.40) | used (0.88) | used (0.78) |
+| 2024-05-25 | 99 | used (0.40) | used (0.88) | used (0.78) |
 | 2024-05-28 | 0 | cloud | cloud | cloud |
 | 2024-06-07 | 0 | cloud | cloud | cloud |
 | 2024-06-09 | 100 | used (0.75) | used (0.90) | used (0.73) |
@@ -50,4 +57,25 @@ Zones are parts of a crop unit whose NDVI was clearly below the rest of the same
 | 2024-07-14 | 0 | cloud | cloud | cloud |
 | 2024-07-19 | 84 | used (0.88) | no canopy (0.28) | no canopy (0.37) |
 | 2024-07-22 | 100 | used (0.93) | no canopy (0.24) | no canopy (0.39) |
-| 2024-07-29 | 100 | used (0.91) | no canopy (0.21) | used (0.43) |
+| 2024-07-29 | 100 | used (0.91) | no canopy (0.21) | other period (0.43) |
+| 2024-08-01 | 0 | cloud | cloud | cloud |
+| 2024-08-06 | 100 | used (0.92) | no canopy (0.18) | other period (0.45) |
+| 2024-08-11 | 0 | cloud | cloud | cloud |
+| 2024-08-13 | 100 | used (0.89) | no canopy (0.15) | other period (0.47) |
+| 2024-08-16 | 0 | cloud | cloud | cloud |
+| 2024-08-21 | 0 | cloud | cloud | cloud |
+| 2024-08-23 | 25 | cloud | cloud | cloud |
+| 2024-08-26 | 100 | used (0.91) | no canopy (0.16) | no canopy (0.20) |
+| 2024-08-28 | 100 | used (0.90) | no canopy (0.16) | no canopy (0.19) |
+| 2024-08-31 | 0 | cloud | cloud | cloud |
+| 2024-09-02 | 100 | used (0.88) | no canopy (0.23) | no canopy (0.21) |
+| 2024-09-05 | 100 | used (0.88) | no canopy (0.31) | no canopy (0.23) |
+| 2024-09-07 | 100 | used (0.87) | other period (0.40) | no canopy (0.26) |
+| 2024-09-12 | 0 | cloud | cloud | cloud |
+| 2024-09-20 | 100 | used (0.88) | other period (0.73) | no canopy (0.23) |
+| 2024-09-22 | 44 | cloud | cloud | cloud |
+| 2024-09-30 | 0 | cloud | cloud | cloud |
+| 2024-10-05 | 0 | cloud | cloud | cloud |
+| 2024-10-15 | 100 | used (0.90) | other period (0.88) | no canopy (0.31) |
+| 2024-10-22 | 0 | cloud | cloud | cloud |
+| 2024-10-25 | 100 | used (0.90) | other period (0.88) | no canopy (0.26) |

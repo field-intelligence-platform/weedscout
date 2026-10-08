@@ -1,19 +1,19 @@
 # Multi-season summary - field DENILI1765120019
 
-Seasons 2019-2024 (04-01 to 07-31 each year). 20.8 ha could be scored in at least 3 seasons.
+Seasons 2019-2024 (03-01 to 10-31 each year). 18.9 ha could be scored in at least 3 seasons.
 
-- **Chronic** (flagged in at least half of the seasons): 0.39 ha
-- **Recurring** (flagged in 2 or more seasons): 1.35 ha
-- Flagged in one season only: 3.91 ha
-- Never flagged: 15.12 ha
+- **Chronic** (flagged in at least half of the seasons): 0.49 ha
+- **Recurring** (flagged in 2 or more seasons): 0.55 ha
+- Flagged in one season only: 2.90 ha
+- Never flagged: 14.97 ha
 
-Recurring + chronic area: **8.4%** of the field, against **6.2%** expected by chance if each season's zones were placed independently - somewhat more than chance: a weak sign of lasting causes.
+Recurring + chronic area: **5.5%** of the field, against **4.5%** expected by chance if each season's zones were placed independently - no more than chance alone would give: zones mostly change from season to season.
 
 | season | usable dates | crop units | flagged |
 |---|---|---|---|
-| 2019 | 17 | 1 | 7.9% |
-| 2020 | 15 | 3 | 5.3% |
-| 2021 | 0 | 0 | no map |
-| 2022 | 12 | 1 | 14.3% |
-| 2023 | 10 | 1 | 7.9% |
-| 2024 | 9 | 2 | 8.1% |
+| 2019 | 18 | 2 | 3.6% |
+| 2020 | 19 | 3 | 4.3% |
+| 2021 | 11 | 3 | 9.7% |
+| 2022 | 14 | 1 | 9.4% |
+| 2023 | 12 | 1 | 5.0% |
+| 2024 | 20 | 2 | 4.1% |

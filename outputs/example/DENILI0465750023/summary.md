@@ -1,14 +1,14 @@
 # Scouting summary - field DENILI0465750023
 
-- Field area: 15.7 ha (14.1 ha analysed; a 10 m edge buffer and crop-unit borders are excluded)
-- Season: 2024-04-01 to 2024-07-31, 27 Sentinel-2 dates found
-- **Scout first:** 0.60 ha in 3 zone(s) - 3 of them at the field edge, where headland compaction, hedge shading or turning overlaps are common causes
+- Field area: 15.7 ha (14.0 ha analysed; a 10 m edge buffer and crop-unit borders are excluded)
+- Season: 2024-03-01 to 2024-10-31, 52 Sentinel-2 dates found
+- **Scout first:** 0.49 ha in 3 zone(s) - 3 of them at the field edge, where headland compaction, hedge shading or turning overlaps are common causes
 - **Watch:** 0.00 ha in 0 zone(s)
-- Normal: 13.45 ha
+- Normal: 13.49 ha
 
 ## Crop units
 
-- **U1**: 14.2 ha, 14 usable dates
+- **U1**: 14.1 ha, 14 usable dates; problems weaker than about 5 % below this crop's normal vigour cannot be told apart from its natural patchiness
 
 ## What this means
 
@@ -18,6 +18,10 @@ Zones are parts of a crop unit whose NDVI was clearly below the rest of the same
 
 | date | field clear % | U1 |
 |---|---|---|
+| 2024-03-01 | 100 | no canopy (0.27) |
+| 2024-03-04 | 0 | cloud |
+| 2024-03-09 | 0 | cloud |
+| 2024-03-31 | 0 | cloud |
 | 2024-04-08 | 100 | used (0.70) |
 | 2024-04-18 | 2 | cloud |
 | 2024-04-23 | 100 | used (0.86) |
@@ -45,3 +49,24 @@ Zones are parts of a crop unit whose NDVI was clearly below the rest of the same
 | 2024-07-19 | 0 | cloud |
 | 2024-07-22 | 100 | no canopy (0.23) |
 | 2024-07-29 | 100 | no canopy (0.21) |
+| 2024-08-01 | 0 | cloud |
+| 2024-08-06 | 100 | no canopy (0.21) |
+| 2024-08-11 | 34 | cloud |
+| 2024-08-13 | 100 | no canopy (0.21) |
+| 2024-08-16 | 100 | no canopy (0.16) |
+| 2024-08-21 | 0 | cloud |
+| 2024-08-23 | 100 | no canopy (0.23) |
+| 2024-08-26 | 100 | no canopy (0.17) |
+| 2024-08-28 | 100 | no canopy (0.18) |
+| 2024-08-31 | 0 | cloud |
+| 2024-09-02 | 100 | no canopy (0.28) |
+| 2024-09-05 | 100 | other period (0.43) |
+| 2024-09-07 | 100 | other period (0.59) |
+| 2024-09-12 | 0 | cloud |
+| 2024-09-20 | 100 | other period (0.87) |
+| 2024-09-22 | 100 | other period (0.89) |
+| 2024-09-30 | 0 | cloud |
+| 2024-10-05 | 0 | cloud |
+| 2024-10-15 | 75 | cloud |
+| 2024-10-22 | 0 | cloud |
+| 2024-10-25 | 100 | other period (0.90) |

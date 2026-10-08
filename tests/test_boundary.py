@@ -112,3 +112,26 @@ def test_example_fields_file_is_valid():
                 for ft in json.loads(p.read_text())["features"]}
     for f in fields:
         assert abs(f.area_ha - official[f.field_id]) / official[f.field_id] < 0.01
+
+
+def test_inspect_reports_every_field_without_raising(tmp_path):
+    from weedscout.boundary import inspect_fields
+
+    bowtie = Polygon([(LON0, LAT0), (LON0 + 0.006, LAT0 + 0.004), (LON0 + 0.006, LAT0), (LON0, LAT0 + 0.004)])
+    huge = box(LON0, LAT0, LON0 + 0.6, LAT0 + 0.4)
+    tiny = box(LON0, LAT0, LON0 + 0.0005, LAT0 + 0.0005)
+    p = tmp_path / "mixed.geojson"
+    _gdf([SQUARE, bowtie, huge, tiny], name=["Nordacker", "Kreuz", "Gemarkung", "Ecke"]).to_file(p)
+    checks = inspect_fields(p)
+    assert [c.status for c in checks] == ["ok", "ok", "too_large", "too_small"]
+    assert [c.name for c in checks] == ["Nordacker", "Kreuz", "Gemarkung", "Ecke"]
+    assert checks[1].repaired and not checks[0].repaired
+    assert 14 < checks[0].area_ha < 18 and checks[0].geometry_wgs84.is_valid
+
+
+def test_file_level_errors_have_codes(tmp_path):
+    p = tmp_path / "notes.txt"
+    p.write_text("x")
+    with pytest.raises(BoundaryError) as e:
+        read_fields(p)
+    assert e.value.code == "unreadable"

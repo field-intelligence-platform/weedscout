@@ -123,21 +123,6 @@ All thresholds are in [`Settings`](src/weedscout/anomaly.py) and [`UnitSettings`
 - **Cloudy seasons give fewer dates.** In 2024 only 14–16 of 27 Sentinel-2 dates were clear over each field, and fewer still had a crop canopy (6–14 per unit). Persistence over 5–6 dates (unit U2 above) is weaker evidence than over 14, which is why `flagged_dates` is reported per zone.
 - **Edge zones** (`at_field_edge = true`) often reflect headland compaction, shading by hedges or turning overlaps rather than in-crop problems.
 
-## What changed from v0 (2025)
-
-v0 thresholded a single NDVI image. A review in October 2026 found that its outputs did not support its claims:
-
-| v0 problem | Evidence | v1 fix |
-|---|---|---|
-| Final spray map had no priorities: every zone was `Unknown` | zones in EPSG:4326 were clipped against an EPSG:32612 raster; a bare `except` hid the error | zone stats come from the polygon's own pixel grid; regression test |
-| The "field" was an 8,000 ha desert quadrilateral in Nevada | scene classification: 89 % bare soil | real official field blocks; boundaries over 1,000 ha are rejected |
-| 99.8 % of the area was flagged | one 7,958 ha polygon | field-relative anomalies; a uniform field yields ~0 zones (tested) |
-| Sentinel-2 offset ignored, so NDVI was biased low | a canopy with true NDVI 0.75 was computed as 0.50; only 2 pixels ever reached "healthy" | baseline-aware reflectance conversion; tested |
-| Area filter used the UTM zone for Germany on Nevada data, with a minimum below one pixel | stored areas 1.75× too large; the filter removed nothing | UTM zone from the field itself; areas checked against geometry |
-| First search result only, no cloud mask | – | every date, SCL masking with 20 m cloud buffer, per-date reasons logged |
-| Lowest NDVI = highest spray priority, so bare soil ranked first | – | reframed as a scouting map; tiers mean persistence, not NDVI level |
-| No-data written as 0 = "no risk"; int64 uncompressed rasters | – | COGs with explicit no-data; uint8 tiers |
-
 ## Roadmap
 
 - **Ground-truth visit** to the example zones next season, recording what was actually there. This turns "suspected" into a measured hit rate.

@@ -25,7 +25,7 @@ from shapely.geometry import shape  # noqa: E402
 
 from .anomaly import NORMAL, SCOUT_FIRST, TIER_LABELS, UNUSUAL_PATTERN, WATCH  # noqa: E402
 from .sentinel import Grid  # noqa: E402
-from .units import UNUSUAL, real_units  # noqa: E402
+from .units import UNCERTAIN, UNUSUAL, real_units  # noqa: E402
 
 TIER_COLORS = {NORMAL: "#d9d9d9", WATCH: "#f2b134", SCOUT_FIRST: "#c0392b", UNUSUAL_PATTERN: "#8e6bbf"}
 ATTRIBUTION = (
@@ -66,7 +66,7 @@ def write_vectors(out_dir: Path, zones: gpd.GeoDataFrame, field_wgs84, field_id:
 
 
 def _unit_outlines(units: np.ndarray, grid: Grid) -> gpd.GeoDataFrame:
-    crops = np.where(units == UNUSUAL, 0, units).astype("uint8")
+    crops = np.where(np.isin(units, (UNUSUAL, UNCERTAIN)), 0, units).astype("uint8")
     polys = [(shape(g), int(v)) for g, v in shapes(crops, mask=crops > 0, transform=grid.transform)]
     gdf = gpd.GeoDataFrame({"unit": [v for _, v in polys]}, geometry=[p for p, _ in polys])
     return gdf.dissolve("unit").reset_index()
@@ -140,7 +140,9 @@ def write_report(out_dir: Path, report: dict):
             f"a {s['edge_buffer_m']:.0f} m edge buffer and crop-unit borders are excluded)",
             f"- Season: {report['season']['start']} to {report['season']['end']}, "
             f"{report['season']['dates_found']} Sentinel-2 dates found",
-            f"- **Scout first:** {z['scout_first_ha']:.2f} ha in {z['scout_first_count']} zone(s)",
+            f"- **Scout first:** {z['scout_first_ha']:.2f} ha in {z['scout_first_count']} zone(s)"
+            + (f" - {z['scout_first_at_edge_count']} of them at the field edge, where headland compaction, "
+               "hedge shading or turning overlaps are common causes" if z.get("scout_first_at_edge_count") else ""),
             f"- **Watch:** {z['watch_ha']:.2f} ha in {z['watch_count']} zone(s)",
             f"- Normal: {z['normal_ha']:.2f} ha",
         ]

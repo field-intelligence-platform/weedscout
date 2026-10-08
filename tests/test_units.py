@@ -74,6 +74,30 @@ def test_small_patch_unlike_any_crop_is_unusual():
     assert real_units(units) == [1, 2]
 
 
+def test_patch_touching_a_unit_but_not_following_its_curve_is_unusual():
+    """Field 1765: a strip green in April, bare in May-June and re-greening in July touched
+    the summer crop and was clustered into it. It must not be scored against that crop."""
+    cereal = [0.8, 0.8, 0.8, 0.8, 0.3, 0.2, 0.2, 0.2]
+    maize = [0.2, 0.2, 0.2, 0.5, 0.9, 0.9, 0.9, 0.9]
+    tongue = [0.75, 0.45, 0.35, 0.35, 0.35, 0.45, 0.55, 0.6]
+    strip = (slice(10, 14), slice(10, 15))  # 20 px, touching the maize half (cols 15+)
+    dates = []
+    for c, m, t in zip(cereal, maize, tongue):
+        v = np.full((30, 30), c)
+        v[:, 15:] = m
+        v[strip] = t
+        dates.append(v + np.random.default_rng(0).normal(0, 0.01, v.shape))
+    units, _ = crop_units(dates, np.ones((30, 30), bool), 0.01, SMALL_UNITS)
+    assert not np.isin(units[strip], real_units(units)).any()  # not scored as any crop
+
+
+def test_consensus_split_is_reproducible():
+    dates = _two_crops()
+    a, _ = crop_units(dates, np.ones((30, 30), bool), 0.01, SMALL_UNITS)
+    b, _ = crop_units(dates, np.ones((30, 30), bool), 0.01, SMALL_UNITS)
+    assert np.array_equal(a, b)
+
+
 def test_interior_drops_unit_border_pixels():
     units = np.ones((10, 10), "uint8")
     units[:, 5:] = 2

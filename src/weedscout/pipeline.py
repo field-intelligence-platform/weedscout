@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import numpy as np
@@ -17,7 +17,7 @@ from .anomaly import (
 from .boundary import Field
 from .export import quicklook, write_cog, write_report, write_vectors
 from .sentinel import Grid, Observation, grid_for, load_observations, search
-from .units import UNUSUAL, UnitSettings, crop_units, interior, real_units
+from .units import UNCERTAIN, UNUSUAL, UnitSettings, crop_units, interior, real_units
 from .zones import clean_tiers, zones_from_tiers
 
 log = logging.getLogger(__name__)
@@ -63,6 +63,57 @@ def _empty_season(shape) -> Season:
     )
 
 
+@dataclass
+class Analysis:
+    units: np.ndarray
+    season: Season
+    tiers: np.ndarray  # cleaned tier codes
+    usable_by_unit: dict[int, int]
+    unit_reports: list[dict]
+
+
+def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel_ha: float,
+            s: Settings = Settings(), unit_settings: UnitSettings = UnitSettings(),
+            units: np.ndarray | None = None) -> Analysis:
+    """Crop units -> per-unit anomalies -> cleaned tiers. No I/O, so it can be run
+    thousands of times for calibration. Pass `units` to reuse a crop-unit split."""
+    clear = [(o.date.isoformat(), v) for o, v in ndvis if _clear_fraction(v, mask) >= s.min_clear_fraction]
+    curves = []
+    if units is None:
+        if mask.any():
+            units, curves = crop_units([v for _, v in clear], mask, pixel_ha, unit_settings)
+        else:
+            units = mask.astype("uint8")
+
+    season = _empty_season(mask.shape)
+    usable_by_unit, unit_reports = {}, []
+    for u in real_units(units):
+        umask = interior(units, u) & mask
+        usable, rows = select_dates(ndvis, umask, s)
+        unit = dict(unit_id=u, area_ha=round(float((units == u).sum() * pixel_ha), 2),
+                    analysed_ha=round(float(umask.sum() * pixel_ha), 2), usable_dates=len(usable),
+                    status="ok", dates=rows)
+        if curves:
+            unit["mean_ndvi_curve"] = {d: round(float(c), 3) for (d, _), c in zip(clear, curves[u - 1])}
+        unit_reports.append(unit)
+        if len(usable) < s.min_dates:
+            unit["status"] = "insufficient_data"
+            unit["status_reason"] = (f"only {len(usable)} usable clear-sky canopy date(s); at least {s.min_dates} "
+                                     "are needed to tell a persistent problem zone from a one-off")
+            continue
+        anomalies = [date_anomaly(v, umask, s) for v in usable]
+        for row, a in zip((r for r in rows if r["used"]), anomalies):
+            row["flagged_pct"] = round(float(a.flagged.sum() / a.valid.sum() * 100), 1)
+        part = season_summary(usable, anomalies, umask, s)
+        for name in ("n_valid", "n_flagged", "persistence", "median_ndvi", "mean_relative", "tiers"):
+            getattr(season, name)[umask] = getattr(part, name)[umask]
+        usable_by_unit[u] = len(usable)
+
+    season.tiers[mask & (units == UNUSUAL)] = UNUSUAL_PATTERN
+    tiers = clean_tiers(season.tiers, max(1, int(round(s.min_zone_ha / pixel_ha))))
+    return Analysis(units, season, tiers, usable_by_unit, unit_reports)
+
+
 def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = Settings(),
               max_tile_cloud: float = 80.0, observations: list[Observation] | None = None,
               unit_settings: UnitSettings = UnitSettings()) -> dict:
@@ -88,12 +139,10 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
         units=[],
     )
 
-    # 1. Crop units, from every clear date of the season (bare and harvested dates included).
-    clear = [(o.date.isoformat(), v) for o, v in ndvis if _clear_fraction(v, mask) >= s.min_clear_fraction]
-    clear_all = [v for _, v in clear]
-    units, curves = crop_units(clear_all, mask, pixel_ha, unit_settings) if mask.any() else (mask.astype("uint8"), [])
-    unit_ids = real_units(units)
-    n_units = len(unit_ids)
+    a = analyse(ndvis, mask, pixel_ha, s, unit_settings)
+    units, season, tiers, usable_by_unit = a.units, a.season, a.tiers, a.usable_by_unit
+    report["units"] = a.unit_reports
+    n_units = len(real_units(units))
     if n_units > 1:
         report["warnings"].append(
             f"This boundary appears to contain {n_units} different crops (their seasonal NDVI curves cross). "
@@ -101,33 +150,14 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
             "If this is wrong, the boundary file may not match how the field was sown."
         )
 
-    # 2. Anomalies within each unit.
-    season = _empty_season(grid.shape)
-    usable_by_unit = {}
-    for u in unit_ids:
-        umask = interior(units, u) & mask
-        usable, rows = select_dates(ndvis, umask, s)
-        unit = dict(unit_id=u, area_ha=round(float((units == u).sum() * pixel_ha), 2),
-                    analysed_ha=round(float(umask.sum() * pixel_ha), 2), usable_dates=len(usable),
-                    status="ok", dates=rows)
-        if curves:
-            unit["mean_ndvi_curve"] = {d: round(float(c), 3) for (d, _), c in zip(clear, curves[u - 1])}
-        report["units"].append(unit)
-        if len(usable) < s.min_dates:
-            unit["status"] = "insufficient_data"
-            unit["status_reason"] = (f"only {len(usable)} usable clear-sky canopy date(s); at least {s.min_dates} "
-                                     "are needed to tell a persistent problem zone from a one-off")
-            continue
-        anomalies = [date_anomaly(v, umask, s) for v in usable]
-        for row, a in zip((r for r in rows if r["used"]), anomalies):
-            row["flagged_pct"] = round(float(a.flagged.sum() / a.valid.sum() * 100), 1)
-        part = season_summary(usable, anomalies, umask, s)
-        for name in ("n_valid", "n_flagged", "persistence", "median_ndvi", "mean_relative", "tiers"):
-            getattr(season, name)[umask] = getattr(part, name)[umask]
-        usable_by_unit[u] = len(usable)
-
-    season.tiers[mask & (units == UNUSUAL)] = UNUSUAL_PATTERN
     report["analysed_area_ha"] = round(float(np.isin(season.tiers, (NORMAL, WATCH, SCOUT_FIRST)).sum() * pixel_ha), 2)
+    report["uncertain_unit_ha"] = round(float((units == UNCERTAIN).sum() * pixel_ha), 2)
+    if report["uncertain_unit_ha"]:
+        report["warnings"].append(
+            f"{report['uncertain_unit_ha']:.2f} ha could not be assigned to one crop unit with confidence "
+            f"(fewer than {unit_settings.min_agreement:.0%} of {unit_settings.n_consensus} independent splits agreed). "
+            "It is left unscored (blank on the map)."
+        )
     report["season"]["usable_dates"] = max(usable_by_unit.values(), default=0)
     if not usable_by_unit:
         report["status"] = "insufficient_data"
@@ -140,7 +170,6 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
         return report
 
     # 3. Zones.
-    tiers = clean_tiers(season.tiers, max(1, int(round(s.min_zone_ha / pixel_ha))))
     zones = zones_from_tiers(tiers, season, grid, units, usable_by_unit, field.geometry, s.edge_buffer_m)
     area = {t: float((tiers == t).sum() * pixel_ha) for t in (NORMAL, WATCH, SCOUT_FIRST, UNUSUAL_PATTERN)}
     report["zones"] = dict(
@@ -149,6 +178,7 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
         unusual_pattern_count=int((zones.tier == "unusual_pattern").sum()) if len(zones) else 0,
         scout_first_count=int((zones.tier == "scout_first").sum()) if len(zones) else 0,
         watch_count=int((zones.tier == "watch").sum()) if len(zones) else 0,
+        scout_first_at_edge_count=int(((zones.tier == "scout_first") & zones.at_field_edge).sum()) if len(zones) else 0,
         flagged_share_pct=round((area[WATCH] + area[SCOUT_FIRST])
                                 / max(area[NORMAL] + area[WATCH] + area[SCOUT_FIRST], 1e-9) * 100, 1),
     )
@@ -168,7 +198,8 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
     write_cog(out_dir / "season_median_ndvi.tif", season.median_ndvi.astype("float32"), grid,
               np.float32(np.nan), "median NDVI over usable dates")
     write_cog(out_dir / "crop_units.tif", units, grid, 0, "crop unit (1 = largest)",
-              {UNUSUAL: "unusual seasonal pattern, not a crop unit"})
+              {UNUSUAL: "unusual seasonal pattern, not a crop unit",
+               UNCERTAIN: "crop unit uncertain, not scored"})
     write_vectors(out_dir, zones, field.geometry_wgs84, field.field_id)
     quicklook(
         out_dir / "quicklook.png", tiers, season.median_ndvi, grid, field.geometry, units,

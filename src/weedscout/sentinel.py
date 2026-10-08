@@ -120,7 +120,20 @@ def search(geom_wgs84, start: str, end: str, max_tile_cloud: float = 80.0) -> li
         datetime=f"{start}/{end}",
         query={"eo:cloud_cover": {"lt": max_tile_cloud}},
     ).item_collection()
-    return sorted(items, key=lambda it: it.datetime)
+    return sorted(latest_processing(items), key=lambda it: it.datetime)
+
+
+def latest_processing(items) -> list:
+    """Keep one item per tile and acquisition. The archive can hold the same image twice
+    (original processing and a later reprocessing); reading both doubles the requests
+    for identical data. The highest processing baseline wins."""
+    best = {}
+    for it in items:
+        key = (it.properties.get("s2:mgrs_tile") or it.id.split("_")[5], it.datetime)
+        rank = (float(it.properties.get("s2:processing_baseline") or 0), it.id)
+        if key not in best or rank > best[key][0]:
+            best[key] = (rank, it)
+    return [it for _, it in best.values()]
 
 
 def _read_asset(href: str, grid: Grid) -> np.ndarray:
@@ -142,9 +155,14 @@ def _read_item(item, grid: Grid):
     signed = planetary_computer.sign(item)
     acquired = item.datetime.date()
     offset = boa_offset(item.properties, acquired)
+    scl = _read_asset(signed.assets["SCL"].href, grid).astype("uint8")
+    if not clear_mask(scl).any():
+        # Nothing usable on this grid (cloud, snow, outside the tile): skip the two
+        # band reads, which would only be masked out. Same result, far fewer requests.
+        empty = np.full(grid.shape, np.nan, dtype="float32")
+        return item.id, acquired, empty, empty.copy(), scl
     red_dn = _read_asset(signed.assets["B04"].href, grid)
     nir_dn = _read_asset(signed.assets["B08"].href, grid)
-    scl = _read_asset(signed.assets["SCL"].href, grid).astype("uint8")
     red, nir = to_reflectance(red_dn, offset), to_reflectance(nir_dn, offset)
     keep = clear_mask(scl) & np.isfinite(red) & np.isfinite(nir)
     red[~keep] = np.nan
@@ -152,7 +170,7 @@ def _read_item(item, grid: Grid):
     return item.id, acquired, red, nir, scl
 
 
-def load_observations(items: list, grid: Grid, workers: int = 6) -> list[Observation]:
+def load_observations(items: list, grid: Grid, workers: int = 8) -> list[Observation]:
     """Read and mask every item; items from the same day (overlapping tiles) are merged."""
     with ThreadPoolExecutor(max_workers=workers) as pool:
         results = list(pool.map(lambda it: _read_item(it, grid), items))

@@ -48,3 +48,19 @@ def test_grid_is_snapped_and_metric():
     assert g.res == 10
     assert g.transform.c % 10 == 0 and g.transform.f % 10 == 0
     assert g.width == 46 and g.height == 46
+
+
+def test_reprocessed_duplicates_are_dropped():
+    from datetime import datetime, timezone
+    from types import SimpleNamespace
+
+    from weedscout.sentinel import latest_processing
+
+    t = datetime(2022, 6, 2, 10, 5, tzinfo=timezone.utc)
+    mk = lambda tile, baseline, proc: SimpleNamespace(
+        id=f"S2A_MSIL2A_20220602T100559_R022_T{tile}_{proc}", datetime=t,
+        properties={"s2:mgrs_tile": tile, "s2:processing_baseline": baseline})
+    items = [mk("33UUT", "04.00", "20220603"), mk("33UUT", "05.10", "20240702"),
+             mk("32UQC", "04.00", "20220603"), mk("32UQC", "05.10", "20240702")]
+    kept = latest_processing(items)
+    assert sorted(i.id[-15:] for i in kept) == ["T32UQC_20240702", "T33UUT_20240702"]

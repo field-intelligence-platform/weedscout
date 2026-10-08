@@ -5,6 +5,7 @@ What has been tested, how, and what the numbers say. Everything here is reproduc
 ```bash
 python experiments/calibrate.py                                         # 2024, ~4 min after first download
 python experiments/calibrate.py --start 2023-04-01 --end 2023-07-31 --out experiments/results_2023
+python experiments/select_thresholds.py experiments/results experiments/results_2023   # apply the selection rule
 python experiments/reliability.py                                       # split-half + 2024 vs 2023
 ```
 

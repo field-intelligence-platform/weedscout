@@ -42,6 +42,19 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 | Does it work on a clean machine? | CI: fresh install and full test suite | Linux, Windows, macOS × Python 3.10–3.13 |
 | **Are the zones actually weeds?** | **Field visit** | **Not done yet** |
 
+## Project status
+
+| | Status |
+|---|---|
+| Installs and passes all tests on a clean machine (CI) | ✅ Done |
+| Thresholds chosen by a stated rule on real data, checked on a held-out season | ✅ Done |
+| Zones repeatable across independent images | ✅ Done |
+| Crop-unit split stable across repeated runs | ✅ Done |
+| Blind field-visit kit with control points | ✅ Ready to use |
+| **Ground-truth visit** (are the zones really weeds or another problem?) | ⏳ Open: needs a visit in a growing season |
+| Calibration beyond three fields in one region | ⏳ Open: re-run the calibration on new fields (below) |
+| Satellite weed *detection* | ➖ Not possible at 10 m; planned as v2 on drone imagery |
+
 ## Quick start
 
 ```bash
@@ -81,6 +94,19 @@ weedscout-score-visits outputs/my_run/visit_kit     # after the visit
 
 The kit writes one GPS point per zone plus **blind control points** in Normal areas. All points are shuffled and named P01, P02 … so the visitor cannot tell which is which. You get `points.gpx` for a phone GPS app, a `record_sheet.csv` to fill in (weeds none / few / many, other cause, notes, photo), short visit instructions, and a separate answer key. Scoring then reports how often each tier really had a problem **compared with the controls**. A hit rate means nothing without that comparison.
 
+### Recalibrating for your own fields
+
+The default thresholds come from three fields near Göttingen. To check or recalibrate them for other fields, run the same experiments on your own boundary file for two or more seasons, then apply the selection rule:
+
+```bash
+python experiments/calibrate.py --boundary my_fields.geojson --start 2024-04-01 --end 2024-07-31 --out experiments/my_2024
+python experiments/calibrate.py --boundary my_fields.geojson --start 2023-04-01 --end 2023-07-31 --out experiments/my_2023
+python experiments/select_thresholds.py experiments/my_2024 experiments/my_2023
+python experiments/reliability.py --boundary my_fields.geojson     # split-half (2024) and 2024-vs-2023 repeatability
+```
+
+`select_thresholds.py` prints the setting with the best detection rate that keeps chance false alarms ≤ 1 % and every field ≤ 15 % flagged in every season. Both limits can be changed with `--max-false-alarm` and `--max-flagged`. Each season takes a few minutes for a handful of fields, and the Sentinel-2 data is cached after the first run.
+
 ### Project structure
 
 ```
@@ -94,7 +120,7 @@ src/weedscout/
   pipeline.py   one field from boundary to outputs (analyse() is the pure, I/O-free core)
   visit.py      blind field-visit kit and its scoring
   cli.py        the `weedscout` command
-experiments/    threshold calibration and repeatability experiments on real data
+experiments/    threshold calibration, selection rule and repeatability experiments on real data
 docs/           VALIDATION.md: what was tested and the results
 tests/          offline tests on synthetic fields (no network)
 data/fields/    example boundaries (official Lower Saxony field blocks)
@@ -161,6 +187,7 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**. Th
 ## Roadmap
 
 - **Ground-truth visit** to the example zones, using the blind visit kit. This turns "suspected" into a measured hit rate against control points.
+- **Wider calibration:** more fields, crops and regions, so the default thresholds do not rest on three field blocks.
 - **Multi-year view:** zones that recur across seasons point to lasting causes and deserve more attention than one-off zones.
 - **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed. The scouting map tells the drone where to fly.
 - **Spray-priority dashboard:** FastAPI + MapLibre front-end serving these outputs per field.

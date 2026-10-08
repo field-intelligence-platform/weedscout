@@ -126,6 +126,25 @@ def null_false_alarms(fields, n_shuffle, rng):
     return pd.DataFrame(rows)
 
 
+def scouting_budget(fields):
+    """Share of each real field flagged under each setting. Catches what the chance null
+    cannot: harmless but persistent variation (soil, tramlines) being flagged."""
+    rows = []
+    base_units = {f.field_id: analyse(n, m, g.res**2 / 1e4).units for f, g, m, n in fields}
+    for z, d in itertools.product(Z, DEFICIT):
+        s = replace(Settings(), z_threshold=z, min_relative_deficit=d)
+        runs = {f.field_id: (analyse(n, m, g.res**2 / 1e4, s, units=base_units[f.field_id]), g)
+                for f, g, m, n in fields}
+        for wp, sp in itertools.product(WATCH_P, SCOUT_P):
+            shares = []
+            for a, g in runs.values():
+                t = retier(a.season, wp, sp, max(1, round(s.min_zone_ha / (g.res**2 / 1e4))))
+                shares.append(flagged_share(t))
+            rows.append(dict(z=z, deficit=d, watch_p=wp, scout_p=sp,
+                             real_flagged_mean=float(np.mean(shares)), real_flagged_max=float(max(shares))))
+    return pd.DataFrame(rows)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--boundary", type=Path, default=DEFAULT_BOUNDARY)
@@ -155,6 +174,7 @@ def main():
     summary = rec[(rec.area_ha >= 0.25) & (rec.severity.between(0.10, 0.20))].groupby(keys)[
         ["found", "found_scout"]].mean().reset_index().merge(fa, on=keys)
     summary = summary.rename(columns={"found": "recall_flagged", "found_scout": "recall_scout"})
+    summary = summary.merge(scouting_budget(fields), on=keys)
     summary.sort_values(["recall_scout", "false_alarm_flagged"], ascending=[False, True]).to_csv(
         args.out / "threshold_summary.csv", index=False)
     print(summary.sort_values("recall_scout", ascending=False).head(15).to_string(index=False))

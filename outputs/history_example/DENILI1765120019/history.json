@@ -1,0 +1,99 @@
+{
+  "field_id": "DENILI1765120019",
+  "weedscout_version": "1.2.0",
+  "years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "season": {
+    "start": "04-01",
+    "end": "07-31"
+  },
+  "settings": {
+    "min_clear_fraction": 0.8,
+    "min_canopy_ndvi": 0.4,
+    "z_threshold": -1.5,
+    "min_relative_deficit": 0.05,
+    "min_dates": 3,
+    "watch_persistence": 0.4,
+    "scout_persistence": 0.5,
+    "edge_buffer_m": 10.0,
+    "min_zone_ha": 0.1
+  },
+  "seasons": [
+    {
+      "year": 2019,
+      "dates_found": 30,
+      "usable_dates": 17,
+      "crop_units": 1,
+      "scored_ha": 20.77,
+      "flagged_ha": 1.64,
+      "flagged_share": 0.079,
+      "status": "ok"
+    },
+    {
+      "year": 2020,
+      "dates_found": 33,
+      "usable_dates": 15,
+      "crop_units": 3,
+      "scored_ha": 16.32,
+      "flagged_ha": 0.87,
+      "flagged_share": 0.0533,
+      "status": "ok"
+    },
+    {
+      "year": 2021,
+      "dates_found": 28,
+      "usable_dates": 0,
+      "crop_units": 0,
+      "scored_ha": 0.0,
+      "flagged_ha": 0.0,
+      "flagged_share": 0.0,
+      "status": "insufficient_data"
+    },
+    {
+      "year": 2022,
+      "dates_found": 34,
+      "usable_dates": 12,
+      "crop_units": 1,
+      "scored_ha": 18.42,
+      "flagged_ha": 2.64,
+      "flagged_share": 0.1433,
+      "status": "ok"
+    },
+    {
+      "year": 2023,
+      "dates_found": 26,
+      "usable_dates": 10,
+      "crop_units": 1,
+      "scored_ha": 19.18,
+      "flagged_ha": 1.52,
+      "flagged_share": 0.0792,
+      "status": "ok"
+    },
+    {
+      "year": 2024,
+      "dates_found": 27,
+      "usable_dates": 9,
+      "crop_units": 2,
+      "scored_ha": 16.6,
+      "flagged_ha": 1.34,
+      "flagged_share": 0.0807,
+      "status": "ok"
+    }
+  ],
+  "analysed_ha": 20.77,
+  "area_ha": {
+    "not_flagged": 15.12,
+    "flagged_once": 3.91,
+    "recurring": 1.35,
+    "chronic": 0.39
+  },
+  "recurring_share_observed": 0.0838,
+  "recurring_share_expected_by_chance": 0.0622,
+  "recurring_vs_chance": 1.35
+}

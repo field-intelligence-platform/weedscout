@@ -14,6 +14,7 @@ venv/
 # Runs go to outputs/; only the curated example run is committed.
 outputs/*
 !outputs/example/
+!outputs/history_example/
 
 # Raw experiment tables are large and reproducible (python experiments/calibrate.py)
-experiments/results*/*_raw.csv
+experiments/**/*_raw.csv

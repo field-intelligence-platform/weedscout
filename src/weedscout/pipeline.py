@@ -163,7 +163,8 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
         report["status"] = "insufficient_data"
         report["status_reason"] = (
             f"fewer than {s.min_dates} usable clear-sky canopy dates; a single date cannot tell a "
-            "persistent problem zone from a one-off. Widen the date range."
+            "persistent problem zone from a one-off. Widen the date range, and match it to the crop: "
+            "late crops such as maize or sugar beet only form a canopy from about June, so use e.g. June-September."
         )
         write_report(out_dir, report)
         log.warning("%s: %s", field.field_id, report["status_reason"])

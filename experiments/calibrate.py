@@ -14,6 +14,7 @@ Run:  python experiments/calibrate.py            (about 10 minutes; data cached 
 from __future__ import annotations
 
 import argparse
+import json
 import itertools
 import logging
 from dataclasses import replace
@@ -157,6 +158,9 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.getLogger("pyogrio").setLevel(logging.WARNING)
     args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "season.json").write_text(json.dumps(
+        dict(start=args.start, end=args.end, boundary=str(args.boundary.relative_to(ROOT))
+             if args.boundary.is_relative_to(ROOT) else str(args.boundary))), encoding="utf-8")
 
     rng = np.random.default_rng(42)
     fields = load_fields(args.boundary, args.start, args.end)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weedscout"
-version = "1.4.0"
+version = "1.5.0"
 description = "Within-field low-vigour scouting maps from Sentinel-2 (scouting priority, not weed detection)"
 readme = "README.md"
 requires-python = ">=3.10"

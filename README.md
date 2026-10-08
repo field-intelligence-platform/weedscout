@@ -184,6 +184,7 @@ Every feature becomes one field. The id comes from `field_id`, `id`, `flik` or `
 | `persistence_pct.tif` | % of usable dates each pixel was flagged | QGIS |
 | `season_median_ndvi.tif` | median NDVI over usable dates | QGIS |
 | `crop_units.tif` | crop unit per pixel (254 = unit uncertain, 255 = unusual pattern) | QGIS |
+| `zone_series.json` | per zone and usable date: the zone's median NDVI, the rest of its crop, and whether the zone was flagged – the evidence behind "weaker on 8 of 10 dates" | charts, the farm portal |
 | `report.json` | everything above plus settings, Sentinel-2 item ids and per-unit NDVI curves, for reproducibility | – |
 
 ## Method

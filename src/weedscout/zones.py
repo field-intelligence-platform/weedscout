@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import geopandas as gpd
 import numpy as np
-from rasterio.features import shapes
+import pandas as pd
+from rasterio.features import rasterize, shapes
 from scipy import ndimage
 from shapely.geometry import shape
 
@@ -113,3 +114,32 @@ def zones_from_tiers(tiers: np.ndarray, season: Season, grid: Grid, units: np.nd
         return gpd.GeoDataFrame(columns=columns, geometry="geometry", crs=4326)
     gdf = gpd.GeoDataFrame(records, columns=columns, geometry="geometry", crs=grid.crs)
     return gdf.to_crs(4326)
+
+
+def zone_series(zones: gpd.GeoDataFrame, grid: Grid, unit_dates: dict) -> dict:
+    """Per scored zone and usable date: the zone's median NDVI, the rest of its crop unit, and
+    whether the zone was flagged that date (at least half of its pixels). This is the evidence
+    behind "weaker on 8 of 10 clear dates" – shown to the user as a chart, not hidden."""
+    out: dict = {}
+    if not len(zones):
+        return out
+    local = zones.to_crs(grid.crs)
+    for _, z in local.iterrows():
+        if z.unit_id is None or pd.isna(z.unit_id) or int(z.unit_id) not in unit_dates:
+            continue  # unusual-pattern zones are not compared with any crop
+        umask, dates = unit_dates[int(z.unit_id)]
+        zmask = rasterize([z.geometry], out_shape=grid.shape, transform=grid.transform, fill=0,
+                          default_value=1).astype(bool) & umask
+        if not zmask.any():
+            continue
+        rest = umask & ~zmask
+        rows = []
+        for d, v, a in dates:
+            zv, rv = v[zmask], v[rest]
+            zv, rv = zv[np.isfinite(zv)], rv[np.isfinite(rv)]
+            valid = a.valid[zmask]
+            share = float(a.flagged[zmask][valid].mean()) if valid.any() else 0.0
+            rows.append(dict(date=d, zone=round(float(np.median(zv)), 3) if zv.size else None,
+                             crop=round(float(np.median(rv)), 3) if rv.size else None, flagged=share >= 0.5))
+        out[str(int(z.zone_id))] = dict(unit_id=int(z.unit_id), dates=rows)
+    return out

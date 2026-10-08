@@ -40,6 +40,12 @@ def test_persistent_patch_becomes_scout_first(square_field, tmp_path):
     # Stored area agrees with the geometry measured in a metric CRS (v0 stored areas 1.75x too large).
     assert np.isclose(zones.to_crs(square_field.crs).area.iloc[zones.area_ha.idxmax()] / 1e4, top.area_ha, rtol=0.01)
 
+    # The evidence per zone: on every usable date the zone was weaker than the rest of its crop.
+    series = json.loads((tmp_path / "test_field" / "zone_series.json").read_text())
+    s = series[str(int(top.zone_id))]
+    assert s["unit_id"] == 1 and len(s["dates"]) == 8
+    assert all(d["flagged"] and d["zone"] < d["crop"] for d in s["dates"])
+
 
 def test_one_off_dip_is_only_watch_or_normal(square_field, tmp_path):
     grid = grid_for(square_field.geometry, square_field.crs)

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import asdict, dataclass
+import json
+from dataclasses import asdict, dataclass, field as dc_field
 from pathlib import Path
 
 import numpy as np
@@ -18,7 +19,7 @@ from .boundary import Field
 from .export import quicklook, write_cog, write_report, write_vectors
 from .sentinel import Grid, Observation, grid_for, load_observations, search
 from .units import UNCERTAIN, UNUSUAL, UnitSettings, crop_units, interior, real_units
-from .zones import clean_tiers, zones_from_tiers
+from .zones import clean_tiers, zone_series, zones_from_tiers
 
 log = logging.getLogger(__name__)
 
@@ -112,6 +113,8 @@ class Analysis:
     tiers: np.ndarray  # cleaned tier codes
     usable_by_unit: dict[int, int]
     unit_reports: list[dict]
+    # per crop unit: (interior mask, [(date, ndvi, anomaly) for each usable date]) – for zone_series
+    unit_dates: dict = dc_field(default_factory=dict)
 
 
 def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel_ha: float,
@@ -128,7 +131,7 @@ def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel
             units = mask.astype("uint8")
 
     season = _empty_season(mask.shape)
-    usable_by_unit, unit_reports = {}, []
+    usable_by_unit, unit_reports, unit_dates = {}, [], {}
     for u in real_units(units):
         umask = interior(units, u) & mask
         usable, rows = select_dates(ndvis, umask, s)
@@ -144,6 +147,7 @@ def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel
                                      "are needed to tell a persistent problem zone from a one-off")
             continue
         anomalies = [date_anomaly(v, umask, s) for v in usable]
+        unit_dates[u] = (umask, list(zip([r["date"] for r in rows if r["used"]], usable, anomalies)))
         for row, a in zip((r for r in rows if r["used"]), anomalies):
             row["flagged_pct"] = round(float(a.flagged.sum() / a.valid.sum() * 100), 1)
         unit["detectable_deficit_pct"] = detectable_deficit_pct(anomalies, s)
@@ -154,7 +158,7 @@ def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel
 
     season.tiers[mask & (units == UNUSUAL)] = UNUSUAL_PATTERN
     tiers = clean_tiers(season.tiers, max(1, int(round(s.min_zone_ha / pixel_ha))))
-    return Analysis(units, season, tiers, usable_by_unit, unit_reports)
+    return Analysis(units, season, tiers, usable_by_unit, unit_reports, unit_dates)
 
 
 def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = Settings(),
@@ -246,6 +250,7 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
               {UNUSUAL: "unusual seasonal pattern, not a crop unit",
                UNCERTAIN: "crop unit uncertain, not scored"})
     write_vectors(out_dir, zones, field.geometry_wgs84, field.field_id)
+    (out_dir / "zone_series.json").write_text(json.dumps(zone_series(zones, grid, a.unit_dates)), encoding="utf-8")
     quicklook(
         out_dir / "quicklook.png", tiers, season.median_ndvi, grid, field.geometry, units,
         title=f"Field {field.field_id} - where to scout first",

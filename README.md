@@ -1,5 +1,7 @@
 # Precision Weed Scouting — where to look first, from Sentinel-2
 
+**Version 1.0.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: working, not yet ground-truthed
+
 Give it a field-boundary file and a season. It returns a map of the zones that **underperformed the rest of their own crop on most clear-sky dates**, so a farmer, agronomist or drone knows where to walk first.
 
 It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, so individual weeds and most weed patches are not visible from orbit. Low vigour can come from weeds, but equally from waterlogging, compaction, nutrient deficiency, pests or poor emergence. Every output says this, and each zone carries the evidence behind it ("flagged on 8 of 9 clear dates"). Actual weed detection is the job of v2, a segmentation model on drone imagery (see [Roadmap](#roadmap)).
@@ -20,6 +22,8 @@ A uniform field returns almost nothing, which is the correct answer for a field 
 
 **Not yet validated on the ground.** These zones have not been visited. Until they are, treat the tiers as a prioritised list of places to check, not as findings.
 
+Maps for the other two fields: [DENILI0565200005](outputs/example/DENILI0565200005/quicklook.png) (three crop units, including a separately sown plot) · [DENILI0465750023](outputs/example/DENILI0465750023/quicklook.png) (uniform field, almost nothing flagged).
+
 ## Quick start
 
 ```bash
@@ -33,7 +37,39 @@ weedscout --boundary data/fields/goettingen_example_fields.geojson \
 pytest                                                   # 37 offline tests, no network needed
 ```
 
-No API key is needed: imagery comes from the free [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/) STAC API. A run over three fields and one season takes about a minute.
+No API key is needed: imagery comes from the free [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/) STAC API. A run over three fields and one season takes about a minute. The command above reproduces the committed example in [`outputs/example/`](outputs/example/).
+
+### Command-line options
+
+| Option | Default | Meaning |
+|---|---|---|
+| `--boundary` | required | boundary file; every feature is one field |
+| `--start`, `--end` | required | season window, `YYYY-MM-DD`. Include some bare-soil and post-harvest dates: they are what separates crops into units |
+| `--out` | `outputs` | output folder; one sub-folder per field |
+| `--id-column` | auto | attribute holding the field id (auto: `field_id`, `id`, `flik`, `name`) |
+| `--min-zone-ha` | `0.1` | smallest zone that is reported |
+| `--edge-buffer-m` | `10` | strip along the field edge left out of the analysis |
+| `--max-tile-cloud` | `80` | loose pre-filter on whole-tile cloud cover; the field itself is checked pixel by pixel |
+| `-v` | off | verbose logging |
+
+Exit code `0` = all fields mapped, `1` = at least one field had too few usable dates, `2` = the boundary file could not be used.
+
+### Project structure
+
+```
+src/weedscout/
+  boundary.py   read and validate boundary files, choose the UTM zone
+  sentinel.py   Sentinel-2 search, reflectance conversion, cloud masking, 10 m field grid
+  units.py      split a boundary into crop units from seasonal NDVI curves
+  anomaly.py    per-date field-relative anomalies, persistence, tiers, all thresholds
+  zones.py      clean tiers, vectorise zones with per-zone statistics
+  export.py     COG / GeoJSON / Shapefile / PNG / summary writers
+  pipeline.py   one field from boundary to outputs
+  cli.py        the `weedscout` command
+tests/          offline tests on synthetic fields (no network)
+data/fields/    example boundaries (official Lower Saxony field blocks)
+outputs/example/  committed example run, 2024 season
+```
 
 ### Input: the boundary files farmers already have
 

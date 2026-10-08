@@ -1,9 +1,16 @@
- __pycache__/
+__pycache__/
 *.pyc
+*.egg-info/
+.pytest_cache/
 .ipynb_checkpoints/
 .env
 .venv/
+venv/
 .vscode/
 .idea/
-*.tif.aux.xml
+*.aux.xml
 *.ovr
+*.qgz~
+# Runs go to outputs/; only the curated example run is committed.
+outputs/*
+!outputs/example/

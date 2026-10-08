@@ -258,7 +258,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="weedscout-history", description="Which scouting zones recur across seasons?")
     p.add_argument("--boundary", required=True)
     p.add_argument("--years", default="2019-2024", help="e.g. 2019-2024 or 2020,2022,2024")
-    p.add_argument("--season", default="04-01:07-31", help="MM-DD:MM-DD window applied to every year")
+    p.add_argument("--season", default="03-01:10-31", help="MM-DD:MM-DD window applied to every year")
     p.add_argument("--out", default="outputs/history")
     p.add_argument("--cache", default="outputs/cache", help="folder for downloaded Sentinel-2 series ('' = none)")
     p.add_argument("--id-column")

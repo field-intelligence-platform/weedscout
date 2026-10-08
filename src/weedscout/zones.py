@@ -17,6 +17,9 @@ from .anomaly import NODATA, NORMAL, SCOUT_FIRST, TIER_LABELS, TIER_NAMES, UNUSU
 from .sentinel import Grid
 
 FOUR_CONNECTED = ndimage.generate_binary_structure(2, 1)
+# A zone this large a share of its crop unit is more likely a management difference
+# (sown later, other variety, different previous crop) than a local problem.
+LARGE_SHARE_OF_UNIT = 0.20
 
 
 def _components(mask: np.ndarray):
@@ -94,13 +97,17 @@ def zones_from_tiers(tiers: np.ndarray, season: Season, grid: Grid, units: np.nd
                     usable_dates_in_season=usable_by_unit.get(unit, 0) if scored else None,
                     at_field_edge=bool(field_utm is not None
                                        and geom.distance(field_utm.boundary) <= edge_m + 1.5 * grid.res),
+                    share_of_unit_pct=round(float(px.sum() / max((units == unit).sum(), 1) * 100), 1) if scored else None,
+                    likely_management_difference=bool(scored and px.sum() >= LARGE_SHARE_OF_UNIT * (units == unit).sum()
+                                                      and px.sum() * pixel_ha >= 1.0),
                     geometry=geom,
                 )
             )
 
     columns = [
         "zone_id", "unit_id", "tier", "label", "area_ha", "persistence_pct", "flagged_dates",
-        "ndvi_deficit_pct", "median_ndvi", "usable_dates_in_season", "at_field_edge", "geometry",
+        "ndvi_deficit_pct", "median_ndvi", "usable_dates_in_season", "at_field_edge",
+        "share_of_unit_pct", "likely_management_difference", "geometry",
     ]
     if not records:
         return gpd.GeoDataFrame(columns=columns, geometry="geometry", crs=4326)

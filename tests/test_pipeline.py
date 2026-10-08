@@ -174,3 +174,65 @@ def test_same_crop_with_weak_patch_stays_one_unit(square_field, tmp_path):
     report = run_field(square_field, "2024-04-01", "2024-07-31", tmp_path, observations=obs)
     assert len(report["units"]) == 1
     assert report["zones"]["scout_first_ha"] >= 3.5
+
+
+def test_main_season_picks_the_run_around_the_peak():
+    from weedscout.pipeline import main_season
+
+    #          spring cereal ......  harvest  catch crop
+    medians = [0.6, 0.8, 0.85, None, 0.7, 0.2, 0.5, 0.55]
+    clear = [True, True, True, False, True, True, True, True]
+    assert main_season(medians, clear, 0.4) == {0, 1, 2, 4}  # cloudy date 3 does not break the run
+    assert main_season([0.2, 0.1], [True, True], 0.4) == set()
+
+
+def test_catch_crop_after_harvest_is_not_scored_with_the_main_crop(square_field, tmp_path):
+    """A whole-season window must not mix the cereal with a catch crop sown after harvest."""
+    grid = grid_for(square_field.geometry, square_field.crs)
+    obs = make_observations(grid, 9, patch=_patch(grid), patch_dates={0, 1, 2, 3, 4})
+    curve = [0.70, 0.80, 0.85, 0.85, 0.75, 0.20, 0.45, 0.55, 0.60]  # cereal, harvest, catch crop
+    rng = np.random.default_rng(3)
+    for i, (o, c) in enumerate(zip(obs, curve)):
+        target = np.full(grid.shape, c) + rng.normal(0, 0.02, grid.shape)
+        if i <= 4:
+            target[_patch(grid)] = c * 0.6
+        o.nir = (o.red * (1 + target) / (1 - target)).astype("float32")
+    report = run_field(square_field, "2024-03-01", "2024-10-31", tmp_path, observations=obs)
+    rows = report["units"][0]["dates"]
+    assert [r["used"] for r in rows] == [True] * 5 + [False] * 4
+    assert rows[6]["reason"].startswith("outside this crop's main growing period")
+    assert report["zones"]["scout_first_ha"] >= 0.8  # the patch, judged on the cereal dates only
+
+
+def test_year_option_means_whole_growing_season(tmp_path, monkeypatch):
+    import weedscout.cli as cli
+
+    seen = {}
+    monkeypatch.setattr(cli, "run_field", lambda f, start, end, *a, **k: seen.update(start=start, end=end) or {"status": "ok"})
+    p = tmp_path / "f.geojson"
+    gpd.GeoDataFrame(geometry=[__import__("shapely").geometry.box(9.93, 51.53, 9.9358, 51.5336)], crs=4326).to_file(p)
+    assert cli.main(["--boundary", str(p), "--year", "2024", "--out", str(tmp_path)]) == 0
+    assert seen == {"start": "2024-03-01", "end": "2024-10-31"}
+
+
+def test_large_zone_is_marked_as_possible_management_difference(square_field, tmp_path):
+    grid = grid_for(square_field.geometry, square_field.crs)
+    big = _patch(grid, rows=slice(4, 24), cols=slice(4, 24))  # 4 ha of a ~14 ha unit
+    run_field(square_field, "2024-05-01", "2024-07-01", tmp_path, observations=make_observations(grid, 8, patch=big))
+    zones = gpd.read_file(tmp_path / "test_field" / "scouting_zones.geojson")
+    top = zones.sort_values("area_ha").iloc[-1]
+    assert top.likely_management_difference and top.share_of_unit_pct >= 20
+    assert "management difference" in (tmp_path / "test_field" / "summary.md").read_text()
+
+
+def test_detectable_deficit_reflects_field_patchiness(square_field, tmp_path):
+    grid = grid_for(square_field.geometry, square_field.crs)
+    smooth = run_field(square_field, "2024-05-01", "2024-07-01", tmp_path / "a",
+                       observations=make_observations(grid, 6, noise=0.01))
+    patchy = run_field(square_field, "2024-05-01", "2024-07-01", tmp_path / "b",
+                       observations=make_observations(grid, 6, noise=0.08))
+    d_smooth = smooth["units"][0]["detectable_deficit_pct"]
+    d_patchy = patchy["units"][0]["detectable_deficit_pct"]
+    assert d_smooth == 5.0  # floor: the minimum relative deficit
+    assert d_patchy > 10  # a patchy crop hides weaker problems
+    assert "cannot be told apart" in (tmp_path / "b" / "test_field" / "summary.md").read_text()

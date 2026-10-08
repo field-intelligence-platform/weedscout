@@ -35,16 +35,50 @@ def _clear_fraction(v: np.ndarray, mask: np.ndarray) -> float:
     return float((mask & np.isfinite(v)).sum() / mask.sum()) if mask.any() else 0.0
 
 
+def main_season(medians: list[float | None], clear_ok: list[bool], min_canopy: float) -> set[int]:
+    """Indices of the crop's main growing period: the run of canopy dates around the
+    season's NDVI peak. A clear date without canopy (bare soil, harvest) ends a run, so
+    a catch crop or regrowth after harvest is not mixed with the main crop."""
+    runs, current = [], []
+    for i, (m, ok) in enumerate(zip(medians, clear_ok)):
+        if not ok:
+            continue  # cloudy dates neither extend nor break a run
+        if m >= min_canopy:
+            current.append(i)
+        elif current:
+            runs.append(current)
+            current = []
+    if current:
+        runs.append(current)
+    if not runs:
+        return set()
+    return set(max(runs, key=lambda r: max(medians[i] for i in r)))
+
+
 def select_dates(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, s: Settings):
-    """Decide which dates can be used for `mask`, and record why the others cannot."""
-    usable, rows = [], []
-    for obs, v in ndvis:
+    """Decide which dates can be used for `mask`, and record why the others cannot.
+
+    Only dates in this crop unit's own main growing period are used, so one
+    whole-season window serves early crops (cereals: spring) and late crops
+    (maize, beet: summer) alike."""
+    clears, medians = [], []
+    for _, v in ndvis:
         clear = _clear_fraction(v, mask)
-        median = float(np.nanmedian(v[mask])) if clear > 0 else None
-        if clear < s.min_clear_fraction:
+        clears.append(clear)
+        medians.append(float(np.nanmedian(v[mask])) if clear > 0 else None)
+    clear_ok = [c >= s.min_clear_fraction for c in clears]
+    season = main_season(medians, clear_ok, s.min_canopy_ndvi) if s.main_season_only else {
+        i for i, (m, ok) in enumerate(zip(medians, clear_ok)) if ok and m >= s.min_canopy_ndvi}
+
+    usable, rows = [], []
+    for i, (obs, v) in enumerate(ndvis):
+        clear, median = clears[i], medians[i]
+        if not clear_ok[i]:
             reason = f"clouds/shadow/snow: only {clear:.0%} clear"
         elif median < s.min_canopy_ndvi:
             reason = f"no crop canopy (median NDVI {median:.2f} < {s.min_canopy_ndvi})"
+        elif i not in season:
+            reason = "outside this crop's main growing period (e.g. catch crop or regrowth after harvest)"
         else:
             reason = "ok"
             usable.append(v)
@@ -53,6 +87,14 @@ def select_dates(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, 
             median_ndvi=None if median is None else round(median, 3), clear_pct=round(clear * 100, 1),
         ))
     return usable, rows
+
+
+def detectable_deficit_pct(anomalies, s: Settings) -> float:
+    """Smallest NDVI deficit (as % of the crop median) that can stand out from this crop's
+    own natural patchiness: |z threshold| x robust spread, never below the deficit floor.
+    Validation showed weaker problems are mostly missed (docs/VALIDATION.md, section 5)."""
+    spread = float(np.median([a.robust_sd / a.field_median for a in anomalies]))
+    return round(100 * max(abs(s.z_threshold) * spread, s.min_relative_deficit), 1)
 
 
 def _empty_season(shape) -> Season:
@@ -104,6 +146,7 @@ def analyse(ndvis: list[tuple[Observation, np.ndarray]], mask: np.ndarray, pixel
         anomalies = [date_anomaly(v, umask, s) for v in usable]
         for row, a in zip((r for r in rows if r["used"]), anomalies):
             row["flagged_pct"] = round(float(a.flagged.sum() / a.valid.sum() * 100), 1)
+        unit["detectable_deficit_pct"] = detectable_deficit_pct(anomalies, s)
         part = season_summary(usable, anomalies, umask, s)
         for name in ("n_valid", "n_flagged", "persistence", "median_ndvi", "mean_relative", "tiers"):
             getattr(season, name)[umask] = getattr(part, name)[umask]
@@ -180,6 +223,7 @@ def run_field(field: Field, start: str, end: str, out_root: Path, s: Settings = 
         scout_first_count=int((zones.tier == "scout_first").sum()) if len(zones) else 0,
         watch_count=int((zones.tier == "watch").sum()) if len(zones) else 0,
         scout_first_at_edge_count=int(((zones.tier == "scout_first") & zones.at_field_edge).sum()) if len(zones) else 0,
+        large_zone_count=int(zones.likely_management_difference.fillna(False).astype(bool).sum()) if len(zones) else 0,
         flagged_share_pct=round((area[WATCH] + area[SCOUT_FIRST])
                                 / max(area[NORMAL] + area[WATCH] + area[SCOUT_FIRST], 1e-9) * 100, 1),
     )

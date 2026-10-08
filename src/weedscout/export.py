@@ -59,6 +59,7 @@ def write_vectors(out_dir: Path, zones: gpd.GeoDataFrame, field_wgs84, field_id:
             "persistence_pct": "persist_pc", "flagged_dates": "flag_dates",
             "ndvi_deficit_pct": "deficit_pc", "median_ndvi": "med_ndvi",
             "usable_dates_in_season": "n_dates", "at_field_edge": "at_edge",
+            "share_of_unit_pct": "unit_share", "likely_management_difference": "mgmt_diff",
         })
         with tempfile.TemporaryDirectory() as tmp:
             shp.to_file(Path(tmp) / "scouting_zones.shp")
@@ -123,6 +124,8 @@ def _short(row: dict) -> str:
         return f"used ({row['median_ndvi']:.2f})"
     if row["reason"].startswith("clouds"):
         return "cloud"
+    if row["reason"].startswith("outside"):
+        return f"other period ({row['median_ndvi']:.2f})"
     return f"no canopy ({row['median_ndvi']:.2f})"
 
 
@@ -146,12 +149,18 @@ def write_report(out_dir: Path, report: dict):
             f"- **Watch:** {z['watch_ha']:.2f} ha in {z['watch_count']} zone(s)",
             f"- Normal: {z['normal_ha']:.2f} ha",
         ]
+        if z.get("large_zone_count"):
+            lines.append(f"- {z['large_zone_count']} zone(s) cover 20 % or more of their crop. A block that large is more "
+                         "often a management difference (sown later, another variety, a different previous crop) than "
+                         "a local problem: check the field records before scouting it")
         if z["unusual_pattern_ha"]:
             lines.append(f"- Unusual seasonal pattern (not scored): {z['unusual_pattern_ha']:.2f} ha "
                          f"in {z['unusual_pattern_count']} zone(s)")
     lines += ["", "## Crop units", ""]
     for u in report["units"]:
-        status = (f"{u['usable_dates']} usable dates" if u["status"] == "ok"
+        status = (f"{u['usable_dates']} usable dates; problems weaker than about "
+                  f"{u['detectable_deficit_pct']:.0f} % below this crop's normal vigour cannot be told apart "
+                  "from its natural patchiness" if u["status"] == "ok"
                   else f"not mapped - {u.get('status_reason', u['status'])}")
         lines.append(f"- **U{u['unit_id']}**: {u['area_ha']:.1f} ha, {status}")
     if report["status"] == "ok":

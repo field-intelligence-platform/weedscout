@@ -30,6 +30,7 @@ TIER_LABELS = {
 class Settings:
     min_clear_fraction: float = 0.8  # share of the field that must be cloud-free on a date
     min_canopy_ndvi: float = 0.4  # field median; below this the crop is not up (or is harvested)
+    main_season_only: bool = True  # score each crop unit only in its own main growing period
     # Anomaly and persistence thresholds were chosen by rule, not by hand: the setting
     # that finds the most injected 0.25-1 ha patches (10-20 % NDVI deficit) while keeping
     # chance false alarms <= 1 % and every real field <= 15 % flagged, in BOTH the 2024

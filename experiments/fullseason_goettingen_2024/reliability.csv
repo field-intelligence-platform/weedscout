@@ -1,0 +1,13 @@
+field,test,dates,scored_ha,scout_ha,scout_refound_pct,flagged_refound_pct,chance_refound_pct,jaccard,units_2023
+DENILI0465750023,split-half: full season vs odd dates,14 vs 7,13.98,0.49,100.0,100.0,5.29,0.66,
+DENILI0465750023,split-half: full season vs even dates,14 vs 7,13.98,0.49,89.8,89.8,3.15,0.9,
+DENILI0465750023,split-half: odd vs even dates (independent images),7 vs 7,13.98,0.62,70.97,59.46,3.15,0.59,
+DENILI0465750023,2024 vs 2023 season,14 vs 16,13.98,0.49,0.0,0.0,0.0,0.0,1.0
+DENILI1765120019,split-half: full season vs odd dates,20 vs 10,15.4,0.63,100.0,100.0,6.3,0.65,
+DENILI1765120019,split-half: full season vs even dates,20 vs 10,15.4,0.63,100.0,100.0,14.74,0.28,
+DENILI1765120019,split-half: odd vs even dates (independent images),10 vs 10,15.4,0.81,77.78,64.95,14.74,0.24,
+DENILI1765120019,2024 vs 2023 season,20 vs 12,8.93,0.0,0.0,0.0,3.36,0.0,1.0
+DENILI0565200005,split-half: full season vs odd dates,21 vs 10,31.12,0.67,100.0,100.0,2.15,1.0,
+DENILI0565200005,split-half: full season vs even dates,21 vs 11,31.12,0.67,100.0,100.0,2.86,0.75,
+DENILI0565200005,split-half: odd vs even dates (independent images),10 vs 11,31.12,0.67,100.0,100.0,2.86,0.75,
+DENILI0565200005,2024 vs 2023 season,21 vs 15,25.92,0.32,53.12,53.12,8.1,0.08,3.0

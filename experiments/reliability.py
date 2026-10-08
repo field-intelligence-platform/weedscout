@@ -53,15 +53,15 @@ def overlap(ref: np.ndarray, other: np.ndarray) -> dict:
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--boundary", type=Path, default=DEFAULT_BOUNDARY)
-    p.add_argument("--out", type=Path, default=ROOT / "experiments" / "results")
+    p.add_argument("--out", type=Path, default=ROOT / "experiments" / "fullseason_goettingen_2024")
     args = p.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logging.getLogger("pyogrio").setLevel(logging.WARNING)
     args.out.mkdir(parents=True, exist_ok=True)
 
     rows = []
-    y24 = load_fields(args.boundary, "2024-04-01", "2024-07-31")
-    y23 = {f.field_id: (m, n) for f, _, m, n in load_fields(args.boundary, "2023-04-01", "2023-07-31")}
+    y24 = load_fields(args.boundary, "2024-03-01", "2024-10-31")
+    y23 = {f.field_id: (m, n) for f, _, m, n in load_fields(args.boundary, "2023-03-01", "2023-10-31")}
     for field, grid, mask, ndvis in y24:
         full = analyse(ndvis, mask, 0.01)
         a = analyse(ndvis[0::2], mask, 0.01, units=full.units)

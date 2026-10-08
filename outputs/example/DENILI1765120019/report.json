@@ -1,0 +1,686 @@
+{
+  "field_id": "DENILI1765120019",
+  "weedscout_version": "1.0.0",
+  "status": "ok",
+  "status_reason": "",
+  "field_area_ha": 22.66,
+  "analysed_area_ha": 17.54,
+  "crs": "EPSG:32632",
+  "season": {
+    "start": "2024-04-01",
+    "end": "2024-07-31",
+    "dates_found": 27,
+    "usable_dates": 9
+  },
+  "settings": {
+    "min_clear_fraction": 0.8,
+    "min_canopy_ndvi": 0.4,
+    "z_threshold": -1.5,
+    "min_relative_deficit": 0.1,
+    "min_dates": 3,
+    "watch_persistence": 0.3,
+    "scout_persistence": 0.6,
+    "edge_buffer_m": 10.0,
+    "min_zone_ha": 0.1
+  },
+  "unit_settings": {
+    "n_clusters": 5,
+    "n_init": 10,
+    "crossing_ndvi": 0.15,
+    "crossing_dates": 2,
+    "min_dates": 4,
+    "min_unit_ha": 1.0,
+    "min_patch_ha": 0.1
+  },
+  "warnings": [
+    "This boundary appears to contain 2 different crops (their seasonal NDVI curves cross). Each crop unit is analysed against itself; unit borders are excluded. If this is wrong, the boundary file may not match how the field was sown.",
+    "0.80 ha has a seasonal NDVI pattern unlike any crop around it (for example green early then bare, or re-greening after harvest). It is shown as 'Unusual seasonal pattern' and not scored, because comparing it with a crop it does not belong to would be meaningless."
+  ],
+  "dates": [
+    {
+      "date": "2024-04-08",
+      "clear_pct": 100.0,
+      "items": [
+        "S2B_MSIL2A_20240408T102559_R108_T32UNC_20240411T160840"
+      ]
+    },
+    {
+      "date": "2024-04-18",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240418T102559_R108_T32UNC_20240418T141814"
+      ]
+    },
+    {
+      "date": "2024-04-23",
+      "clear_pct": 0.9,
+      "items": [
+        "S2A_MSIL2A_20240423T102601_R108_T32UNC_20240423T192005"
+      ]
+    },
+    {
+      "date": "2024-04-30",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240430T102021_R065_T32UNC_20240430T162109"
+      ]
+    },
+    {
+      "date": "2024-05-05",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240505T101559_R065_T32UNC_20240505T141246"
+      ]
+    },
+    {
+      "date": "2024-05-08",
+      "clear_pct": 100.0,
+      "items": [
+        "S2B_MSIL2A_20240508T102559_R108_T32UNC_20240508T141959"
+      ]
+    },
+    {
+      "date": "2024-05-10",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240510T102021_R065_T32UNC_20240510T153633"
+      ]
+    },
+    {
+      "date": "2024-05-13",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240513T103031_R108_T32UNC_20240513T171241"
+      ]
+    },
+    {
+      "date": "2024-05-15",
+      "clear_pct": 100.0,
+      "items": [
+        "S2B_MSIL2A_20240515T101559_R065_T32UNC_20240515T181836"
+      ]
+    },
+    {
+      "date": "2024-05-23",
+      "clear_pct": 13.5,
+      "items": [
+        "S2A_MSIL2A_20240523T103021_R108_T32UNC_20240523T191417"
+      ]
+    },
+    {
+      "date": "2024-05-25",
+      "clear_pct": 100.0,
+      "items": [
+        "S2B_MSIL2A_20240525T101559_R065_T32UNC_20240525T141207"
+      ]
+    },
+    {
+      "date": "2024-05-28",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240528T102559_R108_T32UNC_20240528T143203"
+      ]
+    },
+    {
+      "date": "2024-06-07",
+      "clear_pct": 36.1,
+      "items": [
+        "S2B_MSIL2A_20240607T102559_R108_T32UNC_20240607T151819",
+        "S2B_MSIL2A_20240607T102559_R108_T32UNC_20240607T133635"
+      ]
+    },
+    {
+      "date": "2024-06-09",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240609T102031_R065_T32UNC_20240609T171317"
+      ]
+    },
+    {
+      "date": "2024-06-12",
+      "clear_pct": 0.0,
+      "items": [
+        "S2A_MSIL2A_20240612T103031_R108_T32UNC_20240612T191116"
+      ]
+    },
+    {
+      "date": "2024-06-14",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240614T101559_R065_T32UNC_20240614T142032"
+      ]
+    },
+    {
+      "date": "2024-06-17",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240617T102559_R108_T32UNC_20240617T151313"
+      ]
+    },
+    {
+      "date": "2024-06-22",
+      "clear_pct": 0.0,
+      "items": [
+        "S2A_MSIL2A_20240622T102601_R108_T32UNC_20240622T174255"
+      ]
+    },
+    {
+      "date": "2024-06-24",
+      "clear_pct": 51.5,
+      "items": [
+        "S2B_MSIL2A_20240624T101559_R065_T32UNC_20240624T150022"
+      ]
+    },
+    {
+      "date": "2024-06-27",
+      "clear_pct": 22.7,
+      "items": [
+        "S2B_MSIL2A_20240627T102559_R108_T32UNC_20240627T142256"
+      ]
+    },
+    {
+      "date": "2024-06-29",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240629T102021_R065_T32UNC_20240629T161335"
+      ]
+    },
+    {
+      "date": "2024-07-07",
+      "clear_pct": 100.0,
+      "items": [
+        "S2B_MSIL2A_20240707T102559_R108_T32UNC_20240707T151027"
+      ]
+    },
+    {
+      "date": "2024-07-09",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240709T102031_R065_T32UNC_20240709T161100"
+      ]
+    },
+    {
+      "date": "2024-07-14",
+      "clear_pct": 0.0,
+      "items": [
+        "S2B_MSIL2A_20240714T101559_R065_T32UNC_20240714T151234"
+      ]
+    },
+    {
+      "date": "2024-07-19",
+      "clear_pct": 92.3,
+      "items": [
+        "S2A_MSIL2A_20240719T102021_R065_T32UNC_20240719T152112"
+      ]
+    },
+    {
+      "date": "2024-07-22",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240722T103031_R108_T32UNC_20240722T212900"
+      ]
+    },
+    {
+      "date": "2024-07-29",
+      "clear_pct": 100.0,
+      "items": [
+        "S2A_MSIL2A_20240729T102021_R065_T32UNC_20240729T194952"
+      ]
+    }
+  ],
+  "units": [
+    {
+      "unit_id": 1,
+      "area_ha": 14.27,
+      "analysed_ha": 13.04,
+      "usable_dates": 9,
+      "status": "ok",
+      "dates": [
+        {
+          "date": "2024-04-08",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.747,
+          "clear_pct": 100.0,
+          "flagged_pct": 17.6
+        },
+        {
+          "date": "2024-04-18",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-04-23",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 1% clear",
+          "median_ndvi": 0.703,
+          "clear_pct": 1.4
+        },
+        {
+          "date": "2024-04-30",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.74,
+          "clear_pct": 100.0,
+          "flagged_pct": 30.1
+        },
+        {
+          "date": "2024-05-05",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-05-08",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.797,
+          "clear_pct": 100.0,
+          "flagged_pct": 7.7
+        },
+        {
+          "date": "2024-05-10",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.795,
+          "clear_pct": 100.0,
+          "flagged_pct": 11.3
+        },
+        {
+          "date": "2024-05-13",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.811,
+          "clear_pct": 100.0,
+          "flagged_pct": 15.0
+        },
+        {
+          "date": "2024-05-15",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.827,
+          "clear_pct": 100.0,
+          "flagged_pct": 14.3
+        },
+        {
+          "date": "2024-05-23",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 17% clear",
+          "median_ndvi": 0.762,
+          "clear_pct": 17.0
+        },
+        {
+          "date": "2024-05-25",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.863,
+          "clear_pct": 100.0,
+          "flagged_pct": 12.3
+        },
+        {
+          "date": "2024-05-28",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-07",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 47% clear",
+          "median_ndvi": 0.738,
+          "clear_pct": 47.4
+        },
+        {
+          "date": "2024-06-09",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.802,
+          "clear_pct": 100.0,
+          "flagged_pct": 11.6
+        },
+        {
+          "date": "2024-06-12",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-14",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-17",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-22",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-24",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 41% clear",
+          "median_ndvi": 0.594,
+          "clear_pct": 41.5
+        },
+        {
+          "date": "2024-06-27",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 36% clear",
+          "median_ndvi": 0.582,
+          "clear_pct": 35.7
+        },
+        {
+          "date": "2024-06-29",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.471,
+          "clear_pct": 100.0,
+          "flagged_pct": 0.2
+        },
+        {
+          "date": "2024-07-07",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.35 < 0.4)",
+          "median_ndvi": 0.345,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-07-09",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.27 < 0.4)",
+          "median_ndvi": 0.271,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-07-14",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-07-19",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.22 < 0.4)",
+          "median_ndvi": 0.22,
+          "clear_pct": 97.1
+        },
+        {
+          "date": "2024-07-22",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.21 < 0.4)",
+          "median_ndvi": 0.211,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-07-29",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.20 < 0.4)",
+          "median_ndvi": 0.205,
+          "clear_pct": 100.0
+        }
+      ],
+      "mean_ndvi_curve": {
+        "2024-04-08": 0.714,
+        "2024-04-30": 0.671,
+        "2024-05-08": 0.754,
+        "2024-05-10": 0.758,
+        "2024-05-13": 0.776,
+        "2024-05-15": 0.791,
+        "2024-05-25": 0.832,
+        "2024-06-09": 0.78,
+        "2024-06-29": 0.476,
+        "2024-07-07": 0.364,
+        "2024-07-09": 0.291,
+        "2024-07-19": 0.239,
+        "2024-07-22": 0.222,
+        "2024-07-29": 0.222
+      }
+    },
+    {
+      "unit_id": 2,
+      "area_ha": 5.49,
+      "analysed_ha": 4.5,
+      "usable_dates": 6,
+      "status": "ok",
+      "dates": [
+        {
+          "date": "2024-04-08",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.19 < 0.4)",
+          "median_ndvi": 0.185,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-04-18",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-04-23",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-04-30",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.15 < 0.4)",
+          "median_ndvi": 0.149,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-05",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-05-08",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.14 < 0.4)",
+          "median_ndvi": 0.135,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-10",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.12 < 0.4)",
+          "median_ndvi": 0.121,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-13",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.14 < 0.4)",
+          "median_ndvi": 0.144,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-15",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.13 < 0.4)",
+          "median_ndvi": 0.132,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-23",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 4% clear",
+          "median_ndvi": 0.286,
+          "clear_pct": 4.2
+        },
+        {
+          "date": "2024-05-25",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.20 < 0.4)",
+          "median_ndvi": 0.204,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-05-28",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-07",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 20% clear",
+          "median_ndvi": 0.401,
+          "clear_pct": 20.0
+        },
+        {
+          "date": "2024-06-09",
+          "used": false,
+          "reason": "no crop canopy (median NDVI 0.33 < 0.4)",
+          "median_ndvi": 0.335,
+          "clear_pct": 100.0
+        },
+        {
+          "date": "2024-06-12",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-14",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-17",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-22",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-24",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 67% clear",
+          "median_ndvi": 0.702,
+          "clear_pct": 66.7
+        },
+        {
+          "date": "2024-06-27",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-06-29",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.692,
+          "clear_pct": 100.0,
+          "flagged_pct": 13.3
+        },
+        {
+          "date": "2024-07-07",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.8,
+          "clear_pct": 100.0,
+          "flagged_pct": 11.6
+        },
+        {
+          "date": "2024-07-09",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.778,
+          "clear_pct": 100.0,
+          "flagged_pct": 11.3
+        },
+        {
+          "date": "2024-07-14",
+          "used": false,
+          "reason": "clouds/shadow/snow: only 0% clear",
+          "median_ndvi": null,
+          "clear_pct": 0.0
+        },
+        {
+          "date": "2024-07-19",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.783,
+          "clear_pct": 81.1,
+          "flagged_pct": 1.9
+        },
+        {
+          "date": "2024-07-22",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.833,
+          "clear_pct": 100.0,
+          "flagged_pct": 4.0
+        },
+        {
+          "date": "2024-07-29",
+          "used": true,
+          "reason": "ok",
+          "median_ndvi": 0.834,
+          "clear_pct": 100.0,
+          "flagged_pct": 1.6
+        }
+      ],
+      "mean_ndvi_curve": {
+        "2024-04-08": 0.192,
+        "2024-04-30": 0.157,
+        "2024-05-08": 0.143,
+        "2024-05-10": 0.129,
+        "2024-05-13": 0.149,
+        "2024-05-15": 0.139,
+        "2024-05-25": 0.222,
+        "2024-06-09": 0.336,
+        "2024-06-29": 0.666,
+        "2024-07-07": 0.774,
+        "2024-07-09": 0.753,
+        "2024-07-19": 0.763,
+        "2024-07-22": 0.814,
+        "2024-07-29": 0.818
+      }
+    }
+  ],
+  "zones": {
+    "scout_first_ha": 1.21,
+    "watch_ha": 0.61,
+    "normal_ha": 15.72,
+    "unusual_pattern_ha": 0.8,
+    "unusual_pattern_count": 2,
+    "scout_first_count": 3,
+    "watch_count": 1,
+    "flagged_share_pct": 10.4
+  }
+}

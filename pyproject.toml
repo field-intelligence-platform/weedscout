@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "weedscout"
-version = "1.1.0"
+version = "1.2.0"
 description = "Within-field low-vigour scouting maps from Sentinel-2 (scouting priority, not weed detection)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -29,6 +29,7 @@ dev = ["pytest>=8"]
 weedscout = "weedscout.cli:main"
 weedscout-visit-kit = "weedscout.visit:kit_main"
 weedscout-score-visits = "weedscout.visit:score_main"
+weedscout-history = "weedscout.history:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

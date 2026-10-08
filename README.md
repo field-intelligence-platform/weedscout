@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
 
-**Version 1.1.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: calibrated and repeatability-tested, not yet ground-truthed
+**Version 1.2.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: calibrated, tested out-of-sample on 28 fields across Germany, not yet ground-truthed
 
 Give it a field-boundary file and a season. It returns a map of the zones that **underperformed the rest of their own crop on most clear-sky dates**, so a farmer, agronomist or drone knows where to walk first.
 
@@ -39,6 +39,7 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 | Are the zones repeatable? | Season split into two independent halves of dates | 73–100 % of Scout-first area found again (chance: 4–15 %) |
 | Same zones every year? | 2024 vs 2023 | Mostly not (0–18 %, chance 2–13 %): zones are largely season-specific |
 | Is the crop-unit split stable? | Whole split repeated with 5 different random seed sets | 0 %, 2 % and 0 % of pixels scored differently |
+| **Does it work on fields it was not tuned on?** | Same tests on 28 new fields in 7 regions of Germany | Weaker: 67–79 % of patches found where a map was made; chance false alarms still ≤ 0.3 %. A few fields were over-flagged (up to 40 %) when the season window did not suit the crop |
 | Does it work on a clean machine? | CI: fresh install and full test suite | Linux, Windows, macOS × Python 3.10–3.13 |
 | **Are the zones actually weeds?** | **Field visit** | **Not done yet** |
 
@@ -52,7 +53,10 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 | Crop-unit split stable across repeated runs | ✅ Done |
 | Blind field-visit kit with control points | ✅ Ready to use |
 | **Ground-truth visit** (are the zones really weeds or another problem?) | ⏳ Open: needs a visit in a growing season |
-| Calibration beyond three fields in one region | ⏳ Open: re-run the calibration on new fields (below) |
+| Tested beyond the calibration fields | ✅ 28 fields, 7 regions, 2 seasons: honest out-of-sample recall 67–79 % |
+| Multi-year view: which zones recur across seasons | ✅ Done (`weedscout-history`) |
+| Season window matched to the crop (late crops need a later window) | ⏳ Open: currently set by the user; the tool warns when too few dates |
+| Longer window for the crop-unit split, to separate late-sown plots | ⏳ Open: main cause of over-flagged fields out-of-sample |
 | Satellite weed *detection* | ➖ Not possible at 10 m; planned as v2 on drone imagery |
 
 ## Quick start
@@ -75,7 +79,7 @@ No API key is needed: imagery comes from the free [Microsoft Planetary Computer]
 | Option | Default | Meaning |
 |---|---|---|
 | `--boundary` | required | boundary file; every feature is one field |
-| `--start`, `--end` | required | season window, `YYYY-MM-DD`. Include some bare-soil and post-harvest dates: they are what separates crops into units |
+| `--start`, `--end` | required | season window, `YYYY-MM-DD`. **Match it to the crop:** April–July for winter cereals and rapeseed, roughly June–September for maize and sugar beet. Include some bare-soil and post-harvest dates, which separate crops into units |
 | `--out` | `outputs` | output folder; one sub-folder per field |
 | `--id-column` | auto | attribute holding the field id (auto: `field_id`, `id`, `flik`, `name`) |
 | `--min-zone-ha` | `0.1` | smallest zone that is reported |
@@ -93,6 +97,26 @@ weedscout-score-visits outputs/my_run/visit_kit     # after the visit
 ```
 
 The kit writes one GPS point per zone plus **blind control points** in Normal areas. All points are shuffled and named P01, P02 … so the visitor cannot tell which is which. You get `points.gpx` for a phone GPS app, a `record_sheet.csv` to fill in (weeds none / few / many, other cause, notes, photo), short visit instructions, and a separate answer key. Scoring then reports how often each tier really had a problem **compared with the controls**. A hit rate means nothing without that comparison.
+
+### Multi-year view
+
+```bash
+weedscout-history --boundary data/fields/goettingen_example_fields.geojson --years 2019-2024 --out outputs/history
+```
+
+Each season is analysed on its own, and per pixel the tool counts **in how many seasons it was flagged**: *flagged once*, *recurring* (2 or more seasons) or *chronic* (at least half of the seasons, 3 or more). A zone that comes back year after year points to a lasting cause, such as a wet hollow, compaction or a perennial weed patch, and deserves more attention than a one-season blip.
+
+Some overlap between years happens by chance, so every result is compared with the recurring area **expected if each season's zones were placed independently**:
+
+| Field (2019–2024) | Recurring + chronic | Expected by chance | Reading |
+|---|---|---|---|
+| [DENILI0465750023](outputs/history_example/DENILI0465750023/history_summary.md) | 2.4 % (0.34 ha) | 0.9 % | 2.7× chance: a small lasting problem spot on the north headland |
+| [DENILI1765120019](outputs/history_example/DENILI1765120019/history_summary.md) | 8.4 % | 6.2 % | slightly above chance |
+| [DENILI0565200005](outputs/history_example/DENILI0565200005/history_summary.md) | 6.7 % | 10.3 % | no more than chance: zones change from year to year |
+
+![Multi-year view of field DENILI0465750023, 2019-2024](outputs/history_example/DENILI0465750023/history_quicklook.png)
+
+Outputs per field: `recurrence.tif`, `years_flagged.tif`, `recurring_zones.geojson` (with the seasons each zone was flagged), `history_quicklook.png`, `history_summary.md` and `history.json`. Downloaded Sentinel-2 series are cached in `outputs/cache`, so re-runs are fast.
 
 ### Recalibrating for your own fields
 
@@ -118,13 +142,15 @@ src/weedscout/
   zones.py      clean tiers, vectorise zones with per-zone statistics
   export.py     COG / GeoJSON / Shapefile / PNG / summary writers
   pipeline.py   one field from boundary to outputs (analyse() is the pure, I/O-free core)
+  history.py    multi-year view: recurring zones across seasons, compared with chance
   visit.py      blind field-visit kit and its scoring
   cli.py        the `weedscout` command
-experiments/    threshold calibration, selection rule and repeatability experiments on real data
+experiments/    calibration, selection rule, repeatability and per-region checks on real data
 docs/           VALIDATION.md: what was tested and the results
 tests/          offline tests on synthetic fields (no network)
-data/fields/    example boundaries (official Lower Saxony field blocks)
-outputs/example/  committed example run, 2024 season
+data/fields/    example boundaries + 28 out-of-sample fields from 7 German states (official field blocks)
+outputs/example/          committed example run, 2024 season
+outputs/history_example/  committed multi-year run, 2019-2024
 ```
 
 ### Input: the boundary files farmers already have
@@ -179,7 +205,8 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**. Th
 - **Cause is unknown.** The map says *where*, never *why*. Weeds are one possible cause among many. On the example fields most Scout-first zones are headland zones.
 - **Detection floor of about 0.25 ha.** Patches of 0.1 ha or less, or ones less than about 10 % weaker than the surrounding crop, are not found reliably. Injected patches were uniform over the season; real problems that vary in strength will be found less often.
 - **Weeds are only visible when they change the canopy at 10 m scale**, for example dense patches of grass weeds or thistles over many square metres. Scattered weeds under a closed canopy are invisible.
-- **Calibrated on three fields in one region over two seasons.** Elsewhere the thresholds may need recalibrating; `experiments/calibrate.py` does that in one command.
+- **Calibrated on three fields; weaker on new fields.** On 28 out-of-sample fields in 7 regions, 67–79 % of planted patches were found, against 85–100 % on the calibration fields ([details](docs/VALIDATION.md#5-out-of-sample-28-new-fields-across-germany)). Checking or recalibrating for a new region takes one command per season.
+- **The season window must suit the crop.** With April–July, late crops such as maize may have too few canopy dates (the tool then refuses to map), and two spring-sown plots in one boundary may not be told apart, so one of them gets flagged as a whole. This caused the worst out-of-sample result: a field 40 % flagged.
 - **Field blocks ≠ fields.** The example boundaries are official Lower Saxony *Feldblöcke*, which can hold several farmers' plots. The crop-unit step separates crops with different seasonal curves. Two plots of the same crop sown at the same time cannot be separated.
 - **Some ground is left unscored:** crop-unit borders, pixels whose crop is uncertain (1.05 ha in field 1765), and unusual-pattern patches. They appear blank or purple on the map, never as Normal.
 - **Cloudy seasons give fewer dates.** In 2024 only 14–16 of 27 Sentinel-2 dates were clear over each field, and fewer still had a crop canopy (6–14 per unit). Persistence over 6 dates is weaker evidence than over 14, which is why `flagged_dates` is reported per zone.
@@ -187,15 +214,16 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**. Th
 ## Roadmap
 
 - **Ground-truth visit** to the example zones, using the blind visit kit. This turns "suspected" into a measured hit rate against control points.
-- **Wider calibration:** more fields, crops and regions, so the default thresholds do not rest on three field blocks.
-- **Multi-year view:** zones that recur across seasons point to lasting causes and deserve more attention than one-off zones.
+- **Crop-aware season window:** choose the analysis window from the crop's own green-up, so maize and sugar beet are analysed in their season, not the cereal one.
+- **Longer window for the crop-unit split:** separate crops using spring-to-harvest curves even when zones are scored on a shorter window. This targets the over-flagged fields found out-of-sample.
 - **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed. The scouting map tells the drone where to fly.
 - **Spray-priority dashboard:** FastAPI + MapLibre front-end serving these outputs per field.
 
 ## Data and licences
 
-- Sentinel-2 L2A: Copernicus Sentinel data (2023, 2024), via Microsoft Planetary Computer.
-- Example field boundaries: Data: © ML/SLA Niedersachsen (2024), [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0), Daten bearbeitet. Via [fiboa / Source Cooperative](https://source.coop/fiboa/de-nds).
+- Sentinel-2 L2A: Copernicus Sentinel data (2019–2024), via Microsoft Planetary Computer.
+- Field boundaries, via [fiboa / Source Cooperative](https://source.coop/fiboa), Daten bearbeitet:
+  © ML/SLA Niedersachsen (2024), © Land Brandenburg (2024), © Land Nordrhein-Westfalen (2024), © TLLLR Thüringen (2024), © LfULG Sachsen (2024): [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0) · © Land Schleswig-Holstein (2024): [dl-de/zero-2-0](https://www.govdata.de/dl-de/zero-2-0) · © LM Mecklenburg-Vorpommern (2024): no restrictions.
 
 ## Author
 

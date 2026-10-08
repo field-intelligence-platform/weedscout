@@ -5,7 +5,7 @@ import geopandas as gpd
 import pytest
 from shapely.geometry import Polygon, box
 
-from weedscout.boundary import BoundaryError, read_fields, utm_crs_for
+from weedscout.boundary import BoundaryError, inspect_fields, read_fields, utm_crs_for
 
 # ~16 ha square near Goettingen, lon/lat
 LON0, LAT0 = 9.93, 51.53
@@ -51,6 +51,18 @@ def test_kml(tmp_path):
     )
     (f,) = read_fields(p)
     assert 14 < f.area_ha < 18
+
+
+def test_kml_placemark_name_wins_over_technical_id(tmp_path):
+    coords = " ".join(f"{x},{y},0" for x, y in SQUARE.exterior.coords)
+    p = tmp_path / "export.kml"
+    p.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document>'
+        f'<Placemark id="export.1"><name>Lössacker Nord</name><Polygon><outerBoundaryIs><LinearRing><coordinates>{coords}'
+        "</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>", encoding="utf-8"
+    )
+    (c,) = inspect_fields(p)
+    assert c.name == "Lössacker Nord"
 
 
 def test_gpx_track_walked_around_field(tmp_path):

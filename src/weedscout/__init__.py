@@ -5,4 +5,4 @@ It finds zones that persistently underperform the rest of their own field
 across a growing season, so a person (or a drone) knows where to look first.
 """
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"

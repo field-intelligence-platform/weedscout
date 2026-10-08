@@ -25,7 +25,9 @@ WARN_FIELD_HA = 250.0
 # Below this there are too few interior 10 m pixels for field statistics.
 MIN_FIELD_HA = 1.0
 
-ID_COLUMNS = ("field_id", "id", "flik", "name", "Name", "NAME")
+# Official field ids first, then the name people gave the field. A bare "id" comes last: KML from
+# QGIS or GPS tools gives every placemark a technical id ("export.1"), which must not hide the name.
+ID_COLUMNS = ("field_id", "flik", "name", "Name", "NAME", "id")
 # Formats whose coordinates are WGS84 by specification.
 WGS84_FORMATS = {".geojson", ".json", ".kml", ".kmz", ".gpx"}
 

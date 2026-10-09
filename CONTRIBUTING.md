@@ -11,29 +11,90 @@ at the end is enough.
 
 ---
 
-## 1. Where we talk
+## 1. How we plan and where we talk
 
 Everything about the project stays inside the GitHub organisation
 [field-intelligence-platform](https://github.com/field-intelligence-platform), so decisions are written down next
-to the code and anyone can find them later.
+to the code and anyone can find them later. Work flows in three steps:
+
+```
+Discussions  ──►  Issues  ──►  Boards
+refine the idea    concrete tasks, one     priority, status and
+until it's clear   person each, in a       deadlines across the
+                   version (milestone)     version
+```
+
+### Step 1 – Discussions: refine the idea
+
+| Category | Use for |
+|---|---|
+| **Version planning** | one thread per version, e.g. *"Version planning: weedscout 1.6 – public release"*: goal, proposed scope, open questions |
+| **Ideas** | anything new, not yet tied to a version |
+| **Decisions** | one thread per settled design choice, so the reasoning can be found later |
+| **Q&A** | questions, installation problems |
+| **Announcements** | team-wide news; start with *"How we work"* |
+
+(Until the *Version planning* and *Decisions* categories exist, those threads live in **General**.)
+
+- Question, disagree and refine in the thread until the idea is clear.
+- A thread is settled with a reply that starts with **"Decided:"** and summarises the outcome. A later change gets a
+  new "Decided:" reply, so the history stays readable.
+- Only decided work becomes issues: use **"Create issue from discussion"**, or link the issues in the thread.
+
+### Step 2 – Issues: the concrete tasks
+
+Each issue lives in the repo it belongs to (this repo for weedscout itself, the portal repo for how the portal shows it) and is opened with a template (**Bug report**,
+**Feature / improvement** or **Task**). Every issue has:
+
+- a **milestone** = the version it ships in, e.g. *weedscout 1.6 – public release*, with that version's deadline;
+- labels:
+
+  | Kind | Labels |
+  |---|---|
+  | Type | `bug`, `enhancement`, `documentation`, `chore` |
+  | Priority | `P0` blocking · `P1` high, needed for the version · `P2` medium · `P3` low, someday |
+  | Area | `method`, `validation`, `cli`, `output`, `security`, `ci` |
+  | Flags | `needs discussion` (decide in Discussions before starting) · `blocked` · `good first issue` |
+
+- **one assignee**: the person doing it. If two people are needed, split it into two issues. Assign yourself
+  *before* you start, so nobody builds the same thing twice.
+- a **"Done when"** checklist: how we know it's finished, including tests.
+
+### Step 3 – Boards: priority and deadlines
+
+| Board | Shows |
+|---|---|
+| [Roadmap – all repos](https://github.com/orgs/field-intelligence-platform/projects/1) | every repo on one timeline |
+| [weedscout board](https://github.com/orgs/field-intelligence-platform/projects/3) | this repo's issues and pull requests |
+| [Portal board](https://github.com/orgs/field-intelligence-platform/projects/2) | the farm portal |
+
+Every item has a **Status**, a **Priority**, a **Start date** and a **Target date**:
+
+| Status | Meaning | Who moves it |
+|---|---|---|
+| Backlog | not planned for a version yet | whoever plans |
+| Planned | in a version, not started | whoever plans |
+| In progress | someone is working on it | you, when you start |
+| In review | its pull request is open | you, when you open the pull request |
+| Done | merged or closed | automatic (board workflow); move it by hand if it doesn't |
+
+We plan in **two-week blocks** and keep target dates realistic: we are both part-time. If a date slips, change it
+on the board and say why in the issue, rather than leaving it red.
+
+### Talking to each other
 
 | What | Where |
 |---|---|
-| A bug, a task, a concrete improvement | an **Issue** in this repo |
-| Who works on what, and its status | the organisation's **Projects** board (Planned → In progress → In review → Done) |
-| Ideas, questions, design discussions, decisions | **Discussions** |
 | Feedback on code | comments on the **pull request** |
-| Internal notes (meeting notes, farmer contacts, plans) | the organisation's private team repo, never in a code repo |
+| Questions about one task | comments on its **issue** |
+| Internal notes (meeting notes, farmer contacts, field-visit plans) | the organisation's private team repo, never in a code repo |
 
-Rules of thumb:
-
-- **One issue per piece of work.** Before starting something bigger than a typo, open an issue or comment on an
-  existing one and assign yourself, so two people never build the same thing.
 - **Decisions go in writing.** If something was agreed in a call or chat, add a short summary to the issue or
-  discussion.
+  thread.
 - **Mention people** with `@name` when you need their answer. Reply within a few days, even if only "I'll look at
   this on the weekend".
-- **No personal data in issues or code**: no farmer names, addresses, phone numbers or private field locations.
+- **No personal data in issues, screenshots or code**: no farmer names, addresses, phone numbers or private field
+  locations.
 
 ## 2. Branches
 
@@ -77,6 +138,9 @@ changes, `main` is protected by two things:
 
 ## 3. Getting started
 
+**Setting up a computer for the first time? Follow [INSTALL.md](INSTALL.md)**: every step from an empty machine to
+the first scouting map, with troubleshooting. The short version, for when Git and Python are already installed:
+
 ```bash
 git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
 cd Precision-Weed-Detection-and-Targeted-Spraying
@@ -100,8 +164,9 @@ weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 -
 
 ## 4. Making a change, step by step
 
-1. **Pick or open an issue** and assign yourself. For a bigger change, write two or three sentences in the issue on
-   how you plan to do it, and wait for a quick "sounds good" before writing code.
+1. **Pick or open an issue** and assign yourself, then set its Status on the board to **In progress**. Start with the
+   highest priority in the current version's milestone. For a bigger change, write two or three sentences in the
+   issue on how you plan to do it, and wait for a quick "sounds good" before writing code.
 2. **Branch from the latest `develop`:**
    ```bash
    git switch develop && git pull
@@ -115,7 +180,8 @@ weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 -
    ```bash
    git push -u origin fix/42-kml-names
    ```
-   GitHub prints a link to open the pull request. Base branch: **`develop`**. Fill in the template.
+   GitHub prints a link to open the pull request. Base branch: **`develop`**. Fill in the template and write
+   `Fixes #42` (the issue number) in it. Add the pull request to the board and set the issue to **In review**.
 7. **Review:** the other person reviews. Answer every comment (a fix, or a reason why not). Push more commits to the
    same branch, and don't force-push once someone has started reviewing.
 8. **Merge** when it's approved and CI is green: use **"Squash and merge"** for small pull requests and
@@ -269,7 +335,7 @@ must change before merging; mark the rest as suggestions. Approve once your must
 - [ ] New or changed behaviour has tests; a bug fix has a test that failed before
 - [ ] Method changes: validation re-run, numbers in the pull request, docs updated
 - [ ] README and docs updated if users see the change
-- [ ] Commit messages explain why; the issue is linked (`Fixes #…`)
+- [ ] Commit messages explain why; the issue is linked (`Fixes #…`); the issue is set to **In review** on the board
 - [ ] No secrets, personal data, large files or debug code
 
 Questions about anything here? Open a Discussion. Improvements to this guide are welcome as pull requests too.

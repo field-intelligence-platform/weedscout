@@ -235,6 +235,10 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 - Field boundaries, via [fiboa / Source Cooperative](https://source.coop/fiboa), Daten bearbeitet:
   © ML/SLA Niedersachsen (2024), © Land Brandenburg (2024), © Land Nordrhein-Westfalen (2024), © TLLLR Thüringen (2024), © LfULG Sachsen (2024): [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0) · © Land Schleswig-Holstein (2024): [dl-de/zero-2-0](https://www.govdata.de/dl-de/zero-2-0) · © LM Mecklenburg-Vorpommern (2024): no restrictions.
 
+## Licence
+
+Code: Apache License 2.0 – see [LICENSE](LICENSE). The data above keeps its own terms (see [NOTICE](NOTICE)).
+
 ## Author
 
 **Gowtham Uppalapati** — M.Sc. Sustainable International Agriculture, University of Göttingen & University of Kassel.

@@ -9,6 +9,7 @@ description = "Within-field low-vigour scouting maps from Sentinel-2 (scouting p
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Gowtham Uppalapati" }]
+license = { text = "Apache-2.0" }
 dependencies = [
     "numpy>=1.26",
     "scipy>=1.15",

@@ -1,0 +1,16 @@
+weedscout
+Copyright 2026 Gowtham Uppalapati and the weedscout contributors
+
+This software is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party data used by this software and included in data/ and outputs/ is not covered by that licence
+and keeps its own terms:
+
+- Sentinel-2 L2A imagery: contains modified Copernicus Sentinel data (2019–2024), accessed via the
+  Microsoft Planetary Computer.
+- Field boundaries (data modified), via fiboa / Source Cooperative:
+  © ML/SLA Niedersachsen (2024), © Land Brandenburg (2024), © Land Nordrhein-Westfalen (2024),
+  © TLLLR Thüringen (2024), © LfULG Sachsen (2024): Datenlizenz Deutschland – Namensnennung – Version 2.0
+  (dl-de/by-2-0, https://www.govdata.de/dl-de/by-2-0);
+  © Land Schleswig-Holstein (2024): dl-de/zero-2-0 (https://www.govdata.de/dl-de/zero-2-0);
+  © LM Mecklenburg-Vorpommern (2024): no restrictions.

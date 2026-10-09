@@ -65,6 +65,8 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 
 ## Quick start
 
+New to Python or setting up a new computer? [INSTALL.md](INSTALL.md) walks through every step, with troubleshooting.
+
 ```bash
 git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
 cd Precision-Weed-Detection-and-Targeted-Spraying

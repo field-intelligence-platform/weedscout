@@ -1,0 +1,275 @@
+# Contributing to weedscout
+
+Thanks for helping. weedscout turns free Sentinel-2 imagery into within-field **scouting maps**: zones where the crop
+was persistently weaker than the rest of its field. It is the first analysis module of the
+[Field Intelligence Platform](https://github.com/field-intelligence-platform/field-intelligence-platform), which
+installs a tagged release of this repo.
+
+This guide covers how we work together: where we talk, how branches and reviews work, what a change must include,
+and how a release is made. Read it once fully. Afterwards, the [checklist](#checklist-before-you-open-a-pull-request)
+at the end is enough.
+
+---
+
+## 1. Where we talk
+
+Everything about the project stays inside the GitHub organisation
+[field-intelligence-platform](https://github.com/field-intelligence-platform), so decisions are written down next
+to the code and anyone can find them later.
+
+| What | Where |
+|---|---|
+| A bug, a task, a concrete improvement | an **Issue** in this repo |
+| Who works on what, and its status | the organisation's **Projects** board (Planned → In progress → In review → Done) |
+| Ideas, questions, design discussions, decisions | **Discussions** |
+| Feedback on code | comments on the **pull request** |
+| Internal notes (meeting notes, farmer contacts, plans) | the organisation's private team repo, never in a code repo |
+
+Rules of thumb:
+
+- **One issue per piece of work.** Before starting something bigger than a typo, open an issue or comment on an
+  existing one and assign yourself, so two people never build the same thing.
+- **Decisions go in writing.** If something was agreed in a call or chat, add a short summary to the issue or
+  discussion.
+- **Mention people** with `@name` when you need their answer. Reply within a few days, even if only "I'll look at
+  this on the weekend".
+- **No personal data in issues or code**: no farmer names, addresses, phone numbers or private field locations.
+
+## 2. Branches
+
+```
+main       released code only. Every commit on main is a tagged release (v1.5.1, …).
+develop    the integration branch: finished, reviewed work waiting for the next release.
+feature/…  your work. Branch from develop, merge back into develop by pull request.
+```
+
+| Branch name | Use for |
+|---|---|
+| `feature/<short-name>` | new behaviour, e.g. `feature/zone-confidence` |
+| `fix/<short-name>` or `fix/<issue-number>-<short-name>` | a bug, e.g. `fix/42-kml-names` |
+| `docs/<short-name>` | documentation only |
+| `chore/<short-name>` | tooling, CI, dependencies, refactoring without behaviour change |
+| `hotfix/<short-name>` | an urgent fix to a release (from `main`, see [section 8](#8-releases-and-versions)) |
+
+Rules:
+
+- **Never commit directly to `main`.** `main` changes only through a reviewed pull request from `develop` (a
+  release) or from a `hotfix/…` branch.
+- **Don't commit directly to `develop` either.** Work on a branch and open a pull request into `develop`.
+- **Keep branches short-lived.** A few days is ideal. Update yours from `develop` regularly:
+  `git fetch && git merge origin/develop` (or rebase, if you are comfortable with it and nobody else uses the branch).
+- **Delete the branch** after it is merged (GitHub offers a button).
+
+### Protecting `main`
+
+GitHub can only enforce branch protection on private repos with a paid plan. Until the repo is public or the plan
+changes, `main` is protected by two things:
+
+1. **The team rule above**, checked in review.
+2. **A local hook** that refuses any push to `main` from your computer. Turn it on once after cloning:
+
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+
+   It only blocks pushes to `main`; everything else works as normal. Merging a pull request on GitHub is not
+   affected.
+
+## 3. Getting started
+
+```bash
+git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
+cd Precision-Weed-Detection-and-Targeted-Spraying
+git switch develop
+git config core.hooksPath .githooks
+
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+
+pytest -q                          # offline tests, under a minute, no network needed
+weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 --out outputs/my_run
+```
+
+- Python 3.10 or newer.
+- The repo is private: cloning needs your GitHub login (Git Credential Manager on Windows, or an SSH key).
+- No API key is needed for imagery: it comes from the free Microsoft Planetary Computer STAC API. The first run
+  downloads data; later runs reuse the cache in `outputs/cache/`.
+- The [README](README.md) explains the method, the outputs and the limitations. Read
+  "Limitations – read before using the map" before changing anything in the method.
+
+## 4. Making a change, step by step
+
+1. **Pick or open an issue** and assign yourself. For a bigger change, write two or three sentences in the issue on
+   how you plan to do it, and wait for a quick "sounds good" before writing code.
+2. **Branch from the latest `develop`:**
+   ```bash
+   git switch develop && git pull
+   git switch -c fix/42-kml-names
+   ```
+3. **Write the code and the tests together** (see [section 5](#5-tests)). For a bug: first write a test that fails
+   because of the bug, then fix it.
+4. **Run the tests locally** (`pytest -q`) before every push.
+5. **Commit** in small, meaningful steps (see [commit messages](#commit-messages)).
+6. **Push and open a pull request into `develop`:**
+   ```bash
+   git push -u origin fix/42-kml-names
+   ```
+   GitHub prints a link to open the pull request. Base branch: **`develop`**. Fill in the template.
+7. **Review:** the other person reviews. Answer every comment (a fix, or a reason why not). Push more commits to the
+   same branch, and don't force-push once someone has started reviewing.
+8. **Merge** when it's approved and CI is green: use **"Squash and merge"** for small pull requests and
+   **"Create a merge commit"** when the individual commits are worth keeping. The author merges after approval.
+
+### Commit messages
+
+Write them in English, so the history reads the same for everyone. The style of this repo:
+
+```
+Field names win over technical ids when reading boundary files
+
+KML files from farm software often have both a Name and an id column. The id is a
+database number that means nothing to the farmer, so the name is used first.
+
+Fixes #42
+```
+
+- The **subject line** says what the change does, in the imperative and sentence case, ideally under 72 characters,
+  with no full stop at the end.
+- The **body** (optional for small changes) says *why*, not how. The diff already shows how.
+- **Link the issue** with `Fixes #42` or `Refs #42`. "Fixes" closes the issue automatically when the change reaches
+  the default branch.
+
+### Pull request size
+
+Small pull requests get reviewed quickly and well. One pull request = one purpose. If you notice something else on
+the way, open an issue for it instead of fixing it in the same pull request. A rough guide: if a pull request is over
+~400 changed lines (not counting test data), consider splitting it.
+
+## 5. Tests
+
+- `pytest -q` runs the offline test suite on **synthetic fields**. It never touches the network, so it is fast and
+  works anywhere. Keep it that way: tests that need Sentinel-2 data belong in `experiments/`, not `tests/`.
+- **Every bug fix comes with a test** that failed before the fix.
+- **Every new behaviour comes with tests**, including the unhappy paths: invalid boundary files, fields without
+  clear dates, tiny fields, fields crossing UTM zones.
+- Use the fixtures in `tests/conftest.py` (`square_field`, `make_observations`) instead of building fields by hand.
+- CI runs on every push to `develop`/`main` and on every pull request: a quick Linux check (Python 3.10 and 3.13)
+  always, and the full matrix (Linux, Windows, macOS × Python 3.10–3.13) for pull requests into `main`. A pull
+  request is merged only when CI is green.
+
+### Changes to the method need validation, not just tests
+
+The unit tests prove the code does what it says. They don't prove the map is right. If you change anything that moves
+the results (thresholds, cloud masking, crop units, anomaly scoring, zone cleaning):
+
+1. Re-run the validation in [docs/VALIDATION.md](docs/VALIDATION.md): calibration fields and the 28 out-of-sample
+   fields, both seasons.
+2. Put the before/after numbers in the pull request (detection rate, chance false alarms, share flagged,
+   repeatability).
+3. Update `docs/VALIDATION.md` and the README if the numbers change.
+4. Re-generate the committed examples in `outputs/example/` if the output changes.
+
+A method change whose validation got worse is not merged without a written reason that both of us agree with.
+
+## 6. Code style
+
+- **Match the code around you**: naming, comment density, how errors are reported. A reader should not be able to
+  tell who wrote which file.
+- Python 3.10+ syntax, type hints on public functions, docstrings that say what a function is *for*.
+- Keep `pipeline.analyse()` **pure** (no file or network I/O); I/O belongs in `sentinel.py`, `boundary.py` and
+  `export.py`.
+- Raise errors with **messages a farmer could act on** ("the file has no location information (.prj)"), not just
+  internal ones.
+- **New dependencies need a reason** in the pull request: they make installation slower and can break on some
+  systems. Prefer what is already used (numpy, scipy, rasterio, geopandas, shapely, pyproj, pystac-client).
+  Add them to `pyproject.toml`, never only to your own environment.
+- No commented-out code, debug prints or personal file paths in commits.
+
+## 7. What every feature must respect
+
+These are the project's design rules. A pull request that breaks one of them needs a very good reason.
+
+- **Farmer-openable output.** Results are maps and files farm software opens (GeoTIFF/COG, GeoJSON, Shapefile, KML,
+  GPX), not just a plot.
+- **No-code input.** Accept the boundary files farmers already have (Shapefile, GeoJSON, KML, GPX).
+- **Honest confidence.** Tiers and uncertainty, never an overclaimed single answer. weedscout shows *where to scout
+  first*. It does not detect weeds, and no text, label or output may say it does.
+- **Free, global data only.** Sentinel-1/2 via the Planetary Computer, or other open data with a licence that allows
+  our use. No paid imagery.
+
+## 8. Releases and versions
+
+weedscout uses [semantic versioning](https://semver.org): `MAJOR.MINOR.PATCH`.
+
+| Change | Version |
+|---|---|
+| a bug fix, no change to outputs or options | PATCH: 1.5.1 → 1.5.2 |
+| a new option, output file or feature; existing use keeps working | MINOR: 1.5.1 → 1.6.0 |
+| an existing option, output or file format changes or disappears | MAJOR: 1.5.1 → 2.0.0 |
+
+**Making a release** (done by a maintainer):
+
+1. On a branch from `develop`, set the new version in **both** `pyproject.toml` and `src/weedscout/__init__.py`, and
+   update the README if needed. Merge into `develop` as usual.
+2. Open a pull request **`develop` → `main`** titled `Release 1.6.0`, listing what changed for users. The full CI
+   matrix runs on it.
+3. After approval, merge with **"Create a merge commit"** (never squash a release).
+4. Tag the merge commit on `main` and publish release notes:
+   ```bash
+   git switch main && git pull
+   git tag -a v1.6.0 -m "weedscout 1.6.0"
+   git push origin v1.6.0
+   ```
+   Then on GitHub: **Releases → Draft a new release → choose the tag**, and paste the user-facing notes.
+5. The portal picks up the new version only when someone updates its pin in
+   `backend/pyproject.toml` (`weedscout @ git+…@v1.6.0`) by a pull request in the portal repo, with the portal's
+   tests passing.
+
+**Hotfix** (a release is broken and `develop` already has unreleased work): branch `hotfix/<name>` from `main`, fix
+and test, pull request into `main`, release as a PATCH version, then merge `main` back into `develop` so the fix is
+not lost.
+
+Tags are never moved or deleted once pushed: the portal and anyone else may depend on them.
+
+## 9. Data, licences and what may be committed
+
+- **Licence:** weedscout is licensed under the [Apache License 2.0](LICENSE). By contributing, you agree that your
+  contribution is licensed under the same terms (section 5 of the licence). Copyright stays with each author, and
+  contributors are credited in the git history and the release notes.
+- **Only contribute code you have the right to contribute**: code you wrote, or code under a licence compatible
+  with Apache-2.0 (MIT, BSD, Apache), with its notice kept. Never copy code from projects you work on for an employer
+  or university unless they explicitly allow it, and never from sources without a clear licence.
+- **Data needs a licence that allows our use**, and its attribution goes into [NOTICE](NOTICE) and the README's
+  "Data and licences" section. Field boundaries from real farms are committed only with the farmer's written
+  consent, and never with names or other personal data.
+- **No large files.** Keep committed data and outputs small (a few MB at most). Raw downloads, caches
+  (`outputs/cache/`) and large experiment tables stay out of git. They can be regenerated.
+- **Never commit secrets**: tokens, passwords, API keys, `.env` files. If it happens, tell a maintainer immediately.
+  The secret must be revoked; deleting the commit is not enough.
+
+## 10. Reviewing a pull request
+
+When you review, check:
+
+- [ ] Does it do what the issue asked, and nothing unrelated?
+- [ ] Is there a test that would fail without the change?
+- [ ] Are the error messages understandable for a farmer?
+- [ ] If the method changed: is there validation with before/after numbers?
+- [ ] README, `docs/VALIDATION.md`, examples updated where needed?
+- [ ] Any secrets, personal data, large files or personal paths?
+
+Be specific and kind: suggest, explain why, and say what's good too. Use **"Request changes"** only for things that
+must change before merging; mark the rest as suggestions. Approve once your must-haves are done.
+
+## Checklist before you open a pull request
+
+- [ ] Branched from the latest `develop`; the pull request targets `develop` (or `main` for a release/hotfix)
+- [ ] `pytest -q` passes locally
+- [ ] New or changed behaviour has tests; a bug fix has a test that failed before
+- [ ] Method changes: validation re-run, numbers in the pull request, docs updated
+- [ ] README and docs updated if users see the change
+- [ ] Commit messages explain why; the issue is linked (`Fixes #…`)
+- [ ] No secrets, personal data, large files or debug code
+
+Questions about anything here? Open a Discussion. Improvements to this guide are welcome as pull requests too.

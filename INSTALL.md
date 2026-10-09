@@ -100,6 +100,10 @@ git --version && python3 --version     # must be 3.10–3.13
 
 ## 4. Download the code
 
+> **Contributors (everyone except the team leader):** first create your own **fork** of the repo and clone *that*
+> instead, then connect it to the original. The exact commands are in
+> [CONTRIBUTING.md](CONTRIBUTING.md#as-a-contributor-through-your-fork). Everything else in this guide is the same.
+
 Choose a folder for your projects, for example `C:\Users\<you>\Projects` on Windows or `~/Projects` on
 macOS/Linux:
 

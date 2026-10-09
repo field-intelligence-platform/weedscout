@@ -15,7 +15,7 @@ Fixes #
 
 ## Checklist
 
-- [ ] Targets `develop` (or `main` for a release/hotfix)
+- [ ] From my fork into the organisation's `develop` (only releases go into `main`)
 - [ ] `pytest -q` passes locally
 - [ ] New or changed behaviour has tests; a bug fix has a test that failed before
 - [ ] README / docs / examples updated if users see the change

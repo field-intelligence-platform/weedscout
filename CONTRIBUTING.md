@@ -5,7 +5,7 @@ was persistently weaker than the rest of its field. It is the first analysis mod
 [Field Intelligence Platform](https://github.com/field-intelligence-platform/field-intelligence-platform), which
 installs a tagged release of this repo.
 
-This guide covers how we work together: where we talk, how branches and reviews work, what a change must include,
+This guide covers how we work together: where we talk, the two branches and who merges into them, how reviews work, what a change must include,
 and how a release is made. Read it once fully. Afterwards, the [checklist](#checklist-before-you-open-a-pull-request)
 at the end is enough.
 
@@ -96,37 +96,35 @@ on the board and say why in the issue, rather than leaving it red.
 - **No personal data in issues, screenshots or code**: no farmer names, addresses, phone numbers or private field
   locations.
 
-## 2. Branches
+## 2. Branches and roles
+
+Our repos have exactly **two branches**, and no others:
 
 ```
-main       released code only. Every commit on main is a tagged release (v1.5.1, …).
-develop    the integration branch: finished, reviewed work waiting for the next release.
-feature/…  your work. Branch from develop, merge back into develop by pull request.
+main      the final application. Only verified releases from develop, merged by the team leader.
+develop   current work. Only reviewed changes that work, merged by the team leader.
 ```
 
-| Branch name | Use for |
-|---|---|
-| `feature/<short-name>` | new behaviour, e.g. `feature/zone-confidence` |
-| `fix/<short-name>` or `fix/<issue-number>-<short-name>` | a bug, e.g. `fix/42-kml-names` |
-| `docs/<short-name>` | documentation only |
-| `chore/<short-name>` | tooling, CI, dependencies, refactoring without behaviour change |
-| `hotfix/<short-name>` | an urgent fix to a release (from `main`, see [section 8](#8-releases-and-versions)) |
+| Role | Who | How changes reach `develop` |
+|---|---|---|
+| **Team leader** | organisation owner (currently @gowthamuppalapati) | commits directly to `develop`, after running the checks in [section 5](#5-tests); reviews and merges everyone else's pull requests; makes the releases into `main` |
+| **Contributor** | every other team member | works in their own **fork** (a private copy of the repo under their account) and sends each change as a **pull request into `develop`**. Nothing enters `develop` before the team leader has reviewed it against its issue and confirmed it works |
 
 Rules:
 
-- **Never commit directly to `main`.** `main` changes only through a reviewed pull request from `develop` (a
-  release) or from a `hotfix/…` branch.
-- **Don't commit directly to `develop` either.** Work on a branch and open a pull request into `develop`.
-- **Keep branches short-lived.** A few days is ideal. Update yours from `develop` regularly:
-  `git fetch && git merge origin/develop` (or rebase, if you are comfortable with it and nobody else uses the branch).
-- **Delete the branch** after it is merged (GitHub offers a button).
+- **No extra branches in our repos.** Contributors' work lives in their fork until it is reviewed. (Inside your own
+  fork, branches are up to you; one branch per issue is handy, see [section 4](#4-making-a-change-step-by-step).)
+- **Never commit directly to `main`.** `main` only changes through the release pull request `develop` → `main`
+  ([section 8](#8-releases-and-versions)).
+- **`develop` must always work.** Everything in it has been reviewed and tested, so a release can be made from it at
+  any time.
 
 ### Protecting `main`
 
 GitHub can only enforce branch protection on private repos with a paid plan. Until the repo is public or the plan
 changes, `main` is protected by two things:
 
-1. **The team rule above**, checked in review.
+1. **The rules above.** Only the team leader merges into `main`.
 2. **A local hook** that refuses any push to `main` from your computer. Turn it on once after cloning:
 
    ```bash
@@ -139,7 +137,8 @@ changes, `main` is protected by two things:
 ## 3. Getting started
 
 **Setting up a computer for the first time? Follow [INSTALL.md](INSTALL.md)**: every step from an empty machine to
-the first scouting map, with troubleshooting. The short version, for when Git and Python are already installed:
+the first scouting map, with troubleshooting. **Contributors clone their fork** instead of the organisation's repo
+(see [section 4](#as-a-contributor-through-your-fork)). The short version, for when Git and Python are already installed:
 
 ```bash
 git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
@@ -164,28 +163,61 @@ weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 -
 
 ## 4. Making a change, step by step
 
-1. **Pick or open an issue** and assign yourself, then set its Status on the board to **In progress**. Start with the
-   highest priority in the current version's milestone. For a bigger change, write two or three sentences in the
-   issue on how you plan to do it, and wait for a quick "sounds good" before writing code.
-2. **Branch from the latest `develop`:**
+### As a contributor (through your fork)
+
+**Once: create your fork and connect it**
+
+1. Open the repo on GitHub and click **Fork** (top right) → owner: **your account** → **Create fork**. Your fork is
+   private like the original, and only you and the organisation can see it.
+2. Clone **your fork** (not the organisation's repo) and connect it to the original, which git calls `upstream`:
    ```bash
-   git switch develop && git pull
-   git switch -c fix/42-kml-names
+   git clone https://github.com/<your-username>/Precision-Weed-Detection-and-Targeted-Spraying.git
+   cd Precision-Weed-Detection-and-Targeted-Spraying
+   git remote add upstream https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
+   git config core.hooksPath .githooks
+   ```
+   Then follow [INSTALL.md](INSTALL.md) from step 5 (Python environment) for the rest of the setup.
+
+**For each issue**
+
+1. **Pick an issue** from the current version's milestone, highest priority first. Assign yourself, then set it to
+   **In progress** on the board. For a bigger change, write two or three sentences in the issue on how you plan to
+   do it, and wait for a quick "sounds good" from the team leader before writing code.
+2. **Start from the newest `develop`** of the organisation's repo, on a branch in your fork named after the issue:
+   ```bash
+   git fetch upstream
+   git switch -c 42-kml-names upstream/develop
    ```
 3. **Write the code and the tests together** (see [section 5](#5-tests)). For a bug: first write a test that fails
    because of the bug, then fix it.
-4. **Run the tests locally** (`pytest -q`) before every push.
+4. **Run the checks locally** (section 5). The review will run them again, but finding problems yourself is faster.
 5. **Commit** in small, meaningful steps (see [commit messages](#commit-messages)).
-6. **Push and open a pull request into `develop`:**
+6. **Push to your fork and open a pull request into the organisation's `develop`:**
    ```bash
-   git push -u origin fix/42-kml-names
+   git push -u origin 42-kml-names
    ```
-   GitHub prints a link to open the pull request. Base branch: **`develop`**. Fill in the template and write
-   `Fixes #42` (the issue number) in it. Add the pull request to the board and set the issue to **In review**.
-7. **Review:** the other person reviews. Answer every comment (a fix, or a reason why not). Push more commits to the
-   same branch, and don't force-push once someone has started reviewing.
-8. **Merge** when it's approved and CI is green: use **"Squash and merge"** for small pull requests and
-   **"Create a merge commit"** when the individual commits are worth keeping. The author merges after approval.
+   On GitHub, click **Compare & pull request**. Check that the base is **`field-intelligence-platform/…` →
+   `develop`**. Fill in the template: write `Fixes #42`, explain how you tested it, and for method changes add the validation numbers
+   ([section 5](#5-tests)). Set the issue to **In review** on the board.
+7. **Review:** the team leader checks the change against the issue (see [section 10](#10-reviewing-a-pull-request)).
+   Answer every comment, either with a fix or a reason why not. To update the pull request, push more commits to the
+   same branch of your fork, and don't force-push once the review has started.
+8. **The team leader merges** it into `develop` once it works. Then update your copy, delete the branch, and pick
+   the next issue:
+   ```bash
+   git switch develop && git pull upstream develop
+   git branch -d 42-kml-names && git push origin --delete 42-kml-names
+   ```
+
+### As the team leader
+
+Your own changes go **directly to `develop`**, after the same checks a pull request would get:
+
+1. Assign yourself and set the issue to **In progress**.
+2. `git switch develop && git pull`, then change, test, and run all checks from section 5.
+3. Commit with `Fixes #…` in the message and `git push`. The issue closes and moves to **Done** by itself.
+
+If a change of yours is large or risky, open a pull request from a fork anyway, so someone can look at it first.
 
 ### Commit messages
 
@@ -274,27 +306,34 @@ weedscout uses [semantic versioning](https://semver.org): `MAJOR.MINOR.PATCH`.
 | a new option, output file or feature; existing use keeps working | MINOR: 1.5.1 → 1.6.0 |
 | an existing option, output or file format changes or disappears | MAJOR: 1.5.1 → 2.0.0 |
 
-**Making a release** (done by a maintainer):
+**Making a release** (only the team leader). Nothing reaches `main` without being re-run and verified in full:
 
-1. On a branch from `develop`, set the new version in **both** `pyproject.toml` and `src/weedscout/__init__.py`, and
-   update the README if needed. Merge into `develop` as usual.
-2. Open a pull request **`develop` → `main`** titled `Release 1.6.0`, listing what changed for users. The full CI
-   matrix runs on it.
-3. After approval, merge with **"Create a merge commit"** (never squash a release).
-4. Tag the merge commit on `main` and publish release notes:
+1. **Freeze `develop`:** no merges while the release is checked. Everything planned for the version's milestone is
+   merged, or moved to the next milestone.
+2. **Rerun everything on `develop`**, in a fresh virtual environment (`pip install -e ".[dev]"`):
+   - [ ] `pytest -q`
+   - [ ] the example run (`weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 --out
+         outputs/release_check`), compared with the committed `outputs/example/`
+   - [ ] if the method changed since the last release: the validation in `docs/VALIDATION.md`, numbers updated
+   - [ ] the README's commands still work as written
+   - [ ] every issue in the milestone is closed, and its "Done when" list really holds
+3. **Set the version** in **both** `pyproject.toml` and `src/weedscout/__init__.py`, update the README if needed,
+   commit to `develop`.
+4. **Open the release pull request `develop` → `main`**, titled `Release 1.6.0`, listing what changed for users and
+   the results of step 2. The full CI matrix (Linux, Windows, macOS × Python 3.10–3.13) runs on it and must be green.
+5. **Merge** with **"Create a merge commit"** (never squash a release), then tag it and publish release notes:
    ```bash
    git switch main && git pull
    git tag -a v1.6.0 -m "weedscout 1.6.0"
    git push origin v1.6.0
+   git switch develop
    ```
    Then on GitHub: **Releases → Draft a new release → choose the tag**, and paste the user-facing notes.
-5. The portal picks up the new version only when someone updates its pin in
-   `backend/pyproject.toml` (`weedscout @ git+…@v1.6.0`) by a pull request in the portal repo, with the portal's
-   tests passing.
+6. The portal picks up the new version only when its pin in `backend/pyproject.toml` (`weedscout @ git+…@v1.6.0`) is
+   updated in the portal repo, with the portal's tests passing.
 
-**Hotfix** (a release is broken and `develop` already has unreleased work): branch `hotfix/<name>` from `main`, fix
-and test, pull request into `main`, release as a PATCH version, then merge `main` back into `develop` so the fix is
-not lost.
+**Urgent fix to a release:** because `develop` only ever contains reviewed, working changes, the fix goes into
+`develop` like any other change, and then a PATCH release (`1.6.1`) follows the same steps.
 
 Tags are never moved or deleted once pushed: the portal and anyone else may depend on them.
 
@@ -311,26 +350,47 @@ Tags are never moved or deleted once pushed: the portal and anyone else may depe
   consent, and never with names or other personal data.
 - **No large files.** Keep committed data and outputs small (a few MB at most). Raw downloads, caches
   (`outputs/cache/`) and large experiment tables stay out of git. They can be regenerated.
-- **Never commit secrets**: tokens, passwords, API keys, `.env` files. If it happens, tell a maintainer immediately.
+- **Never commit secrets**: tokens, passwords, API keys, `.env` files. If it happens, tell the team leader immediately.
   The secret must be revoked; deleting the commit is not enough.
 
 ## 10. Reviewing a pull request
 
-When you review, check:
+The team leader reviews every pull request **against its issue** before it may enter `develop`. Approving means
+"I ran it and it works", not "the code looks fine".
 
-- [ ] Does it do what the issue asked, and nothing unrelated?
-- [ ] Is there a test that would fail without the change?
-- [ ] Are the error messages understandable for a farmer?
-- [ ] If the method changed: is there validation with before/after numbers?
-- [ ] README, `docs/VALIDATION.md`, examples updated where needed?
-- [ ] Any secrets, personal data, large files or personal paths?
+1. **Read the issue first**: its steps to reproduce and its "Done when" list.
+2. **Get the change onto your computer** (in your clone of the organisation's repo):
+   ```bash
+   gh pr checkout 42            # the pull request number
+   ```
+   Run `pip install -e ".[dev]"` again if `pyproject.toml` changed.
+3. **Reproduce the issue's steps** (the command and boundary file from the issue). The problem must be gone, and
+   every point of "Done when" must hold. For a bug,
+   also check the test the contributor added fails without the fix.
+4. **Run the checks** from section 5, and look at the CI result on the pull request. CI on a
+   pull request from a fork waits for your approval: click **"Approve and run workflows"** once you've seen the
+   change.
+5. **Read the code** with this list:
+   - [ ] Does it do what the issue asked, and nothing unrelated?
+   - [ ] Is there a test that would fail without the change?
+   - [ ] Are the error messages understandable for a farmer?
+   - [ ] If the method changed: validation with before/after numbers, and are they acceptable?
+   - [ ] README, `docs/VALIDATION.md`, examples updated where needed?
+   - [ ] No secrets, personal data, large files or personal paths?
+6. **Decide:**
+   - Works and the list holds → **Approve**, then **"Squash and merge"** into `develop`. The issue closes and moves
+     to Done.
+   - Doesn't work, or something must change → **"Request changes"** with what you saw (steps, screenshots). It does
+     not enter `develop` until it works.
 
-Be specific and kind: suggest, explain why, and say what's good too. Use **"Request changes"** only for things that
-must change before merging; mark the rest as suggestions. Approve once your must-haves are done.
+Be specific and kind: explain why, suggest how, and say what's good too. Mark optional points as suggestions, so
+it's clear what blocks the merge.
+
+Finally, go back to `develop` (`git switch develop`).
 
 ## Checklist before you open a pull request
 
-- [ ] Branched from the latest `develop`; the pull request targets `develop` (or `main` for a release/hotfix)
+- [ ] Started from the newest `upstream/develop`; the pull request goes from your fork into the organisation's `develop`
 - [ ] `pytest -q` passes locally
 - [ ] New or changed behaviour has tests; a bug fix has a test that failed before
 - [ ] Method changes: validation re-run, numbers in the pull request, docs updated
@@ -338,4 +398,4 @@ must change before merging; mark the rest as suggestions. Approve once your must
 - [ ] Commit messages explain why; the issue is linked (`Fixes #…`); the issue is set to **In review** on the board
 - [ ] No secrets, personal data, large files or debug code
 
-Questions about anything here? Open a Discussion. Improvements to this guide are welcome as pull requests too.
+Questions about anything here? Open a Discussion. Improvements to this guide are welcome as pull requests too, like any other change.

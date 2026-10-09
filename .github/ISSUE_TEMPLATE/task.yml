@@ -1,0 +1,21 @@
+name: Task
+description: A concrete piece of work (chore, docs, refactoring, CI, release step)
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What needs to be done, and why
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      value: |
+        - [ ] …
+    validations:
+      required: true
+  - type: input
+    id: links
+    attributes:
+      label: Related issues / discussions

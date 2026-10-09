@@ -1,0 +1,42 @@
+name: Feature / improvement
+description: A new capability or a change to how something works
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bigger ideas start in **Discussions** (Ideas or the version-planning thread). Open an issue when the idea is
+        agreed, and link the discussion below.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / goal
+      description: Which farmer need or which limitation of the method does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+  - type: input
+    id: discussion
+    attributes:
+      label: Discussion
+      placeholder: link to the discussion where this was agreed
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: Checkable conditions, including tests and both languages.
+      value: |
+        - [ ] …
+        - [ ] Tests added (offline, synthetic fields)
+        - [ ] If results change: validation re-run, before/after numbers (docs/VALIDATION.md)
+    validations:
+      required: true
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Design rules
+      options:
+        - label: Output farmers can open (map/file), honest confidence, free data only – see CONTRIBUTING.md

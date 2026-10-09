@@ -1,6 +1,6 @@
 # Precision Weed Scouting — where to look first, from Sentinel-2
 
-[![tests](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
+[![tests](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
 
 **Version 1.3.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: calibrated, tested out-of-sample on 28 fields across Germany, not yet ground-truthed
 
@@ -66,7 +66,7 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 ## Quick start
 
 ```bash
-git clone https://github.com/gowthamuppalapati/Precision-Weed-Detection-and-Targeted-Spraying.git
+git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
 cd Precision-Weed-Detection-and-Targeted-Spraying
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"

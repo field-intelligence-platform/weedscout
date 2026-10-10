@@ -3,8 +3,8 @@
 Every step to get weedscout running on your own computer, from an empty machine to your first scouting map.
 Written for Windows first, with the macOS/Linux differences next to each step.
 
-**Time:** about 15–20 minutes the first time. **Disk space:** about 1.5 GB (Python packages, plus a few hundred MB
-of satellite data cache once you run analyses). **Internet:** needed for installing and for every new analysis.
+**Time:** about 15–20 minutes the first time. **Disk space:** about 1.5 GB (Python packages; the multi-year view
+and the validation experiments also cache satellite data, a few hundred MB). **Internet:** needed for installing and for every new analysis.
 
 Contents:
 [1. What you need](#1-what-you-need) ·
@@ -200,8 +200,8 @@ weedscout --boundary data/fields/goettingen_example_fields.geojson --year 2024 -
 
 - It needs the internet: the satellite images (Sentinel-2) come from the free Microsoft Planetary Computer. No
   account or API key is needed.
-- It takes about **1–2 minutes**. The first run downloads the images; later runs on the same fields reuse the cache
-  in `outputs/cache/`.
+- It takes about **1–2 minutes**. Each run downloads the images it needs; only the multi-year view and the validation
+  experiments keep a cache (`outputs/cache/`).
 - It prints what it is doing for each field and ends with a short summary.
 
 **With your own fields:** use any boundary file that farm software or Google Earth exports: GeoJSON, Shapefile
@@ -271,7 +271,7 @@ How to make a change and send it to the team (branches, pull requests, reviews) 
 | `pip install` tries to **compile rasterio or GDAL** and fails | Your Python version has no ready-made package: use Python 3.12 (delete `.venv`, create it again with 3.12). |
 | `pip install` fails with **SSL / proxy errors** | You are behind a university or company network. Try another network, or ask IT for the proxy settings (`pip install --proxy http://host:port …`). |
 | A run says **"no clear dates"** or few dates | Too cloudy in that season or period. Try another year, or a whole season (`--year`) instead of a short period. |
-| A run fails with **connection / timeout errors** | The Planetary Computer was briefly unreachable. Run the same command again; already downloaded images come from the cache. |
+| A run fails with **connection / timeout errors** | The Planetary Computer was briefly unreachable. Run the same command again. |
 | **"location information (.prj) is missing"** | A Shapefile was used without its `.prj` file. Export it again with the projection, or zip all its parts together. |
 | Tests fail right after `git pull` | Run `pip install -e ".[dev]"` again (a dependency may have changed). If they still fail on `develop`, tell the team in an issue: that should never happen. |
 | The push is **"refused: open a pull request"** | That's the safety check: you tried to push to `main`. Push your own branch instead (CONTRIBUTING.md). |
@@ -281,5 +281,5 @@ Still stuck? Open a Discussion in the repo with the exact command, the full erro
 ## 12. Remove everything
 
 Everything lives inside the project folder: delete the folder `Precision-Weed-Detection-and-Targeted-Spraying` and
-it is gone, including the venv and the image cache. Git, Python and QGIS stay installed for other projects; remove
+it is gone, including the venv and any image cache. Git, Python and QGIS stay installed for other projects; remove
 them in **Settings → Apps** if you don't need them.

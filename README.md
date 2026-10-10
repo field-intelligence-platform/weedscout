@@ -1,12 +1,24 @@
 # Precision Weed Scouting — where to look first, from Sentinel-2
 
 [![tests](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying)](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/releases/latest)
+[![licence](https://img.shields.io/badge/licence-Apache--2.0-blue)](LICENSE)
 
-**Version 1.3.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: calibrated, tested out-of-sample on 28 fields across Germany, not yet ground-truthed
+Python ≥ 3.10 · Windows, macOS, Linux · free data only (Sentinel-2 via Microsoft Planetary Computer, no account or API key) · open source
 
 Give it a field-boundary file and a year. It returns a map of the zones that **underperformed the rest of their own crop on most clear-sky dates**, so a farmer, agronomist or drone knows where to walk first.
 
 It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, so individual weeds and most weed patches are not visible from orbit. Low vigour can come from weeds, but equally from waterlogging, compaction, nutrient deficiency, pests or poor emergence. Every output says this, and each zone carries the evidence behind it ("flagged on 8 of 9 clear dates"). Actual weed detection is the job of v2, a segmentation model on drone imagery (see [Roadmap](#roadmap)).
+
+> **Status: tested on satellite data, not yet checked in the field.** The method finds 79–81 % of simulated weak
+> patches on 28 fields across Germany it was never tuned on, flags at most 0.1 % of a field by chance, and its zones are repeatable
+> ([how far it has been tested](#how-far-it-has-been-tested)). Whether the zones it finds are weeds or another problem
+> has **not been checked on the ground yet**. That field check is the next step ([#2](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/2)).
+> Until then, treat the map as a prioritised list of places to look, not as findings.
+
+| You give it | You get, per field | Time and cost |
+|---|---|---|
+| A boundary file you already have (Shapefile, GeoJSON, KML/KMZ, GPX, GeoPackage) and a year | A scouting map, zones as GeoJSON/Shapefile for farm software, a plain-language summary, and with the visit kit GPS points for a field visit | About 1–2 minutes for a few fields; free |
 
 ![Scouting map for a 22.7 ha field block near Göttingen, 2024](outputs/example/DENILI1765120019/quicklook.png)
 
@@ -87,7 +99,7 @@ No API key is needed: imagery comes from the free [Microsoft Planetary Computer]
 | `--year` | – | **recommended:** the whole growing season of that year (1 March – 31 October). Each crop is scored only in its own growing period, so cereals and maize are both handled in one run |
 | `--start`, `--end` | – | a custom window (`YYYY-MM-DD`) instead of `--year`. Keep it wide: bare-soil and post-harvest dates are what separate crops into units |
 | `--out` | `outputs` | output folder; one sub-folder per field |
-| `--id-column` | auto | attribute holding the field id (auto: `field_id`, `id`, `flik`, `name`) |
+| `--id-column` | auto | attribute holding the field id (auto, first found: `field_id`, `flik`, `name`/`Name`/`NAME`, `id`) |
 | `--min-zone-ha` | `0.1` | smallest zone that is reported |
 | `--edge-buffer-m` | `10` | strip along the field edge left out of the analysis; `20` also leaves out most headland effects |
 | `--max-tile-cloud` | `80` | loose pre-filter on whole-tile cloud cover; the field itself is checked pixel by pixel |
@@ -169,10 +181,10 @@ outputs/history_example/  committed multi-year run, 2019-2024
 |---|---|
 | Shapefile (`.shp` or zipped `.zip`) | needs its `.prj` file; exports from farm-management software work as-is |
 | GeoJSON, GeoPackage | any CRS |
-| KML | e.g. drawn in Google Earth |
+| KML, KMZ | e.g. drawn in Google Earth |
 | GPX | a track or route walked around the field edge is closed into a polygon |
 
-Every feature becomes one field. The id comes from `field_id`, `id`, `flik` or `name` (or `--id-column`). Boundaries are repaired if self-intersecting. Anything over 1,000 ha or under 1 ha is rejected with a plain explanation, because neither can be analysed as one field at 10 m resolution.
+Every feature becomes one field. The id comes from the first of `field_id`, `flik`, `name` (any capitalisation) or `id` that the file has, so a field's name wins over a technical id (or set it with `--id-column`). Boundaries are repaired if self-intersecting. Anything over 1,000 ha or under 1 ha is rejected with a plain explanation, because neither can be analysed as one field at 10 m resolution.
 
 ### Output, per field (`outputs/<run>/<field_id>/`)
 
@@ -226,10 +238,14 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 
 ## Roadmap
 
-- **Ground-truth visit** to the example zones, using the blind visit kit. This turns "suspected" into a measured hit rate against control points.
+- **Field check** of the example zones with the blind visit kit: turns "places to look" into a measured hit rate
+  against control points ([#2](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/2), planned next).
 - **More regions and crops** for calibration, especially naturally patchy soils, where detection is weakest.
-- **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed. The scouting map tells the drone where to fly.
-- **Spray-priority dashboard:** FastAPI + MapLibre front-end serving these outputs per field.
+- **A safe cache format** for the multi-year view (no pickle files, see [SECURITY.md](SECURITY.md)).
+- **Field Intelligence farm portal:** a web app in development that runs weedscout for a farmer's fields and shows
+  the zones, their evidence and the downloads on a map, in German and English.
+- **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed.
+  The scouting map tells the drone where to fly.
 
 ## Data and licences
 
@@ -237,9 +253,18 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 - Field boundaries, via [fiboa / Source Cooperative](https://source.coop/fiboa), Daten bearbeitet:
   © ML/SLA Niedersachsen (2024), © Land Brandenburg (2024), © Land Nordrhein-Westfalen (2024), © TLLLR Thüringen (2024), © LfULG Sachsen (2024): [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0) · © Land Schleswig-Holstein (2024): [dl-de/zero-2-0](https://www.govdata.de/dl-de/zero-2-0) · © LM Mecklenburg-Vorpommern (2024): no restrictions.
 
-## Contributing
+## Feedback and contributing
 
-How we work (branches, reviews, tests, releases): [CONTRIBUTING.md](CONTRIBUTING.md).
+- **Questions, ideas, results from your own fields:** [Discussions](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/discussions).
+  Reports from a field visit, good or bad, are especially welcome.
+- **Something wrong or broken:** open an [issue](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/new/choose).
+- **A security problem:** please report it privately, see [SECURITY.md](SECURITY.md).
+- **Code or documentation:** contributions are welcome through a fork and a pull request, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## How to cite
+
+If you use weedscout in research or a report, please cite it. GitHub's **"Cite this repository"** button (from
+[CITATION.cff](CITATION.cff)) gives the reference in APA and BibTeX.
 
 ## Licence
 
@@ -248,3 +273,5 @@ Code: Apache License 2.0 – see [LICENSE](LICENSE). The data above keeps its ow
 ## Author
 
 **Gowtham Uppalapati** — M.Sc. Sustainable International Agriculture, University of Göttingen & University of Kassel.
+
+Part of [Field Intelligence Platform](https://github.com/field-intelligence-platform): open tools that turn free satellite data into maps farmers can use.

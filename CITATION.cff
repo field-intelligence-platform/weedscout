@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use weedscout, please cite it as below."
+title: "weedscout: within-field scouting maps from Sentinel-2"
+abstract: >-
+  weedscout turns free Sentinel-2 imagery and a field-boundary file into a map of the zones that
+  persistently underperformed the rest of their own crop, as a prioritised list of places to scout.
+  It is a scouting map, not a weed detector.
+type: software
+version: 1.6.0
+date-released: "2026-10-17"
+license: Apache-2.0
+repository-code: "https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying"
+authors:
+  - given-names: Gowtham
+    family-names: Uppalapati
+keywords:
+  - Sentinel-2
+  - precision agriculture
+  - remote sensing
+  - field scouting
+  - NDVI

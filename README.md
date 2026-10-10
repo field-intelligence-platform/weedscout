@@ -55,6 +55,11 @@ field you know well and tell us whether the zones match the places you know, goo
 [field-visit kit](#field-visit-kit) makes a proper check easy: it adds hidden control points, so a hit rate can be
 compared with chance. Share what you find in [Discussions](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/discussions).
 
+**Want to try it without installing anything?** The Field Intelligence farm portal, a web app built on weedscout, is
+opening for a small group of testers. [**Request early access**](mailto:gowthamuppalapati21@gmail.com?subject=Field%20Intelligence%20%E2%80%93%20early%20access%20/%20Fr%C3%BCher%20Zugang&body=Name%3A%20%0A%0AI%27d%20like%20to%20test%20the%20Field%20Intelligence%20app%20%28weed%20scouting%29.%20/%20Ich%20m%C3%B6chte%20die%20Field-Intelligence-App%20%28Unkraut-Scouting%29%20testen.%0A%0AMy%20name%20and%20email%20are%20used%20only%20to%20send%20me%20the%20access%20link%20and%20occasional%20updates%20about%20the%20app%3B%20I%20can%20ask%20for%20deletion%20at%20any%20time.%20/%20Name%20und%20E-Mail%20werden%20nur%20f%C3%BCr%20den%20Zugangslink%20und%20gelegentliche%20Neuigkeiten%20zur%20App%20genutzt%3B%20auf%20Wunsch%20werden%20sie%20jederzeit%20gel%C3%B6scht.): an email opens with everything filled in;
+add your name and send it. We use your name and email only to send you the access link and occasional updates, and
+delete them whenever you ask.
+
 ## Example results (3 official field blocks near Göttingen, 2024 season)
 
 | Field block | Area | Crop units | Usable dates per crop | Scout first | of which at field edge | Unusual pattern (not scored) | Flagged share |
@@ -304,6 +309,7 @@ All known limits in detail: [docs/VALIDATION.md](docs/VALIDATION.md#known-limits
 
 ## Feedback and contributing
 
+- **Try the farm portal (web app):** [request early access](mailto:gowthamuppalapati21@gmail.com?subject=Field%20Intelligence%20%E2%80%93%20early%20access%20/%20Fr%C3%BCher%20Zugang&body=Name%3A%20%0A%0AI%27d%20like%20to%20test%20the%20Field%20Intelligence%20app%20%28weed%20scouting%29.%20/%20Ich%20m%C3%B6chte%20die%20Field-Intelligence-App%20%28Unkraut-Scouting%29%20testen.%0A%0AMy%20name%20and%20email%20are%20used%20only%20to%20send%20me%20the%20access%20link%20and%20occasional%20updates%20about%20the%20app%3B%20I%20can%20ask%20for%20deletion%20at%20any%20time.%20/%20Name%20und%20E-Mail%20werden%20nur%20f%C3%BCr%20den%20Zugangslink%20und%20gelegentliche%20Neuigkeiten%20zur%20App%20genutzt%3B%20auf%20Wunsch%20werden%20sie%20jederzeit%20gel%C3%B6scht.).
 - **Questions, ideas, results from your own fields:** [Discussions](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/discussions).
   Reports from a field you know, good or bad, are especially welcome (see [Help us check it in the field](#help-us-check-it-in-the-field)).
 - **Something wrong or broken:** open an [issue](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/new/choose).

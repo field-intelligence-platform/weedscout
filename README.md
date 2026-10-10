@@ -13,7 +13,7 @@ It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, 
 > **Status: tested on satellite data, not yet checked in the field.** The method finds 79–81 % of simulated weak
 > patches on 28 fields across Germany it was never tuned on, flags at most 0.1 % of a field by chance, and its zones are repeatable
 > ([how far it has been tested](#how-far-it-has-been-tested)). Whether the zones it finds are weeds or another problem
-> has **not been checked on the ground yet**. That field check is the next step ([#2](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/2)).
+> has **not been checked on the ground yet**. That field check is the next step, and you can help ([see below](#help-us-check-it-in-the-field)).
 > Until then, treat the map as a prioritised list of places to look, not as findings.
 
 | You give it | You get, per field | Time and cost |
@@ -23,6 +23,36 @@ It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, 
 ![Scouting map for a 22.7 ha field block near Göttingen, 2024](outputs/example/DENILI1765120019/quicklook.png)
 
 *Field block DENILI1765120019 near Göttingen, 2024 season. The block holds two crops (U1 winter cereal, U2 summer crop), and each is compared only with itself, in its own growing period. Red marks a persistent low-vigour zone inside a crop. Purple marks pixels whose seasonal curve follows neither crop (including mixed pixels where the two crops meet), so they are shown but not scored. Blank areas inside the field are crop-unit borders and pixels whose crop could not be determined with confidence.*
+
+## Why you can trust what it says – and where it stops
+
+You don't have to take our word for it. Everything below can be checked, and the commands to repeat every test are in
+[docs/VALIDATION.md](docs/VALIDATION.md).
+
+- **Tested against a known answer.** Weak patches were planted into the *real* Sentinel-2 series of real fields, so
+  the right answer was known in advance. On the calibration fields it found **96–100 %** of patches of 0.25 ha or more
+  that were at least 15 % weaker than their crop.
+- **Tested on fields it had never seen:** 28 fields in 7 regions of Germany, two seasons, **79–81 %** of planted
+  patches found.
+- **It does not invent zones.** When the data is shuffled so that only chance could line up a zone, it flags at most
+  **0.1 %** of a field.
+- **Its settings were not tuned to look good.** Thresholds were chosen by a fixed rule written down in advance and then
+  checked on new data. Twice, a setting that looked better on the calibration fields was rejected because it
+  over-flagged new ones.
+- **Every zone shows its evidence:** on how many clear dates it was weaker, and by how much ("weaker on 8 of 10 dates,
+  about 12 % below its crop"). A zone with thin evidence looks thin.
+- **It refuses rather than guesses.** With fewer than 3 usable images for a crop, it makes no map and says why.
+
+**Where it stops:** it cannot see individual weeds or patches much smaller than 0.25 ha (10 m pixels), and it cannot
+tell *why* a spot is weak. Whether its zones are weeds, waterlogging, compaction or something else has **not been
+checked in the field yet**. All limits are listed in [Limitations](#limitations--read-before-using-the-map).
+
+### Help us check it in the field
+
+The one thing satellite tests cannot prove is what the zones *are*. If you farm or advise farmers: run weedscout on a
+field you know well and tell us whether the zones match the places you know, good or bad. The
+[field-visit kit](#field-visit-kit) makes a proper check easy: it adds hidden control points, so a hit rate can be
+compared with chance. Share what you find in [Discussions](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/discussions).
 
 ## Example results (3 official field blocks near Göttingen, 2024 season)
 
@@ -91,6 +121,17 @@ pytest                                                   # offline tests, no net
 
 No API key is needed: imagery comes from the free [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/) STAC API. A run over three fields and one season takes one to two minutes. The command above reproduces the committed example in [`outputs/example/`](outputs/example/).
 
+### Using it in the current season
+
+`--year` works for the season that is still running (for example `--year 2026` in July): it uses every clear image so
+far. Two things to know:
+
+- **The map needs enough clear images of each crop.** At least 3 are required, otherwise there is no map for that
+  crop. The more clear dates, the firmer the map: the example fields had 10–21 per crop over the whole 2024 season.
+- **Each crop is scored in its own growing period.** A winter cereal is judged on its spring growth, so its map becomes
+  useful from about early summer; maize grows later, so its map follows in late summer. Running it again later in the
+  season adds the new images.
+
 ### Command-line options
 
 | Option | Default | Meaning |
@@ -116,7 +157,11 @@ weedscout-score-visits outputs/my_run/visit_kit     # after the visit
 
 The kit writes one GPS point per zone plus **blind control points** in Normal areas. All points are shuffled and named P01, P02 … so the visitor cannot tell which is which. You get `points.gpx` for a phone GPS app, a `record_sheet.csv` to fill in (weeds none / few / many, other cause, notes, photo), short visit instructions, and a separate answer key. Scoring then reports how often each tier really had a problem **compared with the controls**. A hit rate means nothing without that comparison.
 
-### Multi-year view
+### Multi-year view (optional)
+
+Most of the time you only need the current season. The multi-year view answers one extra question: **does a zone come
+back every year?** A spot that returns season after season (a wet hollow, compaction, a perennial weed like thistle)
+needs a lasting fix rather than a one-off treatment.
 
 ```bash
 weedscout-history --boundary data/fields/goettingen_example_fields.geojson --years 2019-2024 --out outputs/history
@@ -239,12 +284,13 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 
 ## Roadmap
 
-- **Field check** of the example zones with the blind visit kit: turns "places to look" into a measured hit rate
-  against control points ([#2](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/2), planned next).
+- **Field check** with the blind visit kit: turns "places to look" into a measured hit rate against control points.
+  Planned next, and open to anyone who wants to try it on their own fields ([how](#help-us-check-it-in-the-field)).
 - **More regions and crops** for calibration, especially naturally patchy soils, where detection is weakest.
 - **Field Intelligence farm portal:** a web app in development that runs weedscout for a farmer's fields and shows
   the zones, their evidence and the downloads on a map, in German and English.
-- **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed.
+- **v2 — weed detection on drone imagery, for the next growing season (2027):** a U-Net / DeepLabv3 segmentation
+  model trained on WeedMap / CropAndWeed.
   The scouting map tells the drone where to fly.
 
 ## Data and licences
@@ -256,7 +302,7 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 ## Feedback and contributing
 
 - **Questions, ideas, results from your own fields:** [Discussions](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/discussions).
-  Reports from a field visit, good or bad, are especially welcome.
+  Reports from a field you know, good or bad, are especially welcome (see [Help us check it in the field](#help-us-check-it-in-the-field)).
 - **Something wrong or broken:** open an [issue](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/new/choose).
 - **A security problem:** please report it privately, see [SECURITY.md](SECURITY.md).
 - **Code or documentation:** contributions are welcome through a fork and a pull request, see [CONTRIBUTING.md](CONTRIBUTING.md).

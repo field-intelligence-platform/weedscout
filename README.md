@@ -30,10 +30,10 @@ You don't have to take our word for it. Everything below can be checked, and the
 [docs/VALIDATION.md](docs/VALIDATION.md).
 
 - **Tested against a known answer.** Weak patches were planted into the *real* Sentinel-2 series of real fields, so
-  the right answer was known in advance. On the calibration fields it found **96–100 %** of patches of 0.25 ha or more
-  that were at least 15 % weaker than their crop.
-- **Tested on fields it had never seen:** 28 fields in 7 regions of Germany, two seasons, **79–81 %** of planted
-  patches found.
+  the right answer was known in advance. On the calibration fields it found **92–100 %** of planted patches of
+  0.25–1 ha that were 10–20 % weaker than their crop (and 96–100 % of those at least 15 % weaker).
+- **Tested on fields it had never seen:** 28 fields in 7 regions of Germany, two seasons: **79–81 %** of the same
+  kind of patches found.
 - **It does not invent zones.** When the data is shuffled so that only chance could line up a zone, it flags at most
   **0.1 %** of a field.
 - **Its settings were not tuned to look good.** Thresholds were chosen by a fixed rule written down in advance and then
@@ -45,7 +45,8 @@ You don't have to take our word for it. Everything below can be checked, and the
 
 **Where it stops:** it cannot see individual weeds or patches much smaller than 0.25 ha (10 m pixels), and it cannot
 tell *why* a spot is weak. Whether its zones are weeds, waterlogging, compaction or something else has **not been
-checked in the field yet**. All limits are listed in [Limitations](#limitations--read-before-using-the-map).
+checked in the field yet**. Practical tips: [Before you use the map](#before-you-use-the-map); every known limit in
+detail: [docs/VALIDATION.md](docs/VALIDATION.md#known-limits).
 
 ### Help us check it in the field
 
@@ -269,18 +270,20 @@ Every feature becomes one field. The id comes from the first of `field_id`, `fli
 
 The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: the setting that finds the most injected weak patches while keeping chance false alarms ≤ 1 % and every real field ≤ 15 % flagged. They were then checked on 28 fields they had never seen ([docs/VALIDATION.md](docs/VALIDATION.md)). All thresholds are in [`Settings`](src/weedscout/anomaly.py) and [`UnitSettings`](src/weedscout/units.py) and are recorded in every `report.json`.
 
-## Limitations — read before using the map
+## Before you use the map
 
-- **Not ground-truthed.** Nothing here has been checked in the field yet. The calibration measures detection of *synthetic* patches in real data; whether real zones are weeds is unknown until a visit.
-- **Cause is unknown.** The map says *where*, never *why*. Weeds are one possible cause among many. On the example fields most Scout-first zones are headland zones.
-- **Detection floor of about 0.25 ha.** Patches of 0.1 ha or less are not found reliably. Injected test patches were uniform over the season; real problems that vary in strength will be found less often.
-- **Patchy crops hide weaker problems.** On naturally variable fields, such as dry sandy soils, only clearly weak spots stand out. Each summary states this limit per crop.
-- **Weeds are only visible when they change the canopy at 10 m scale**, for example dense patches of grass weeds or thistles over many square metres. Scattered weeds under a closed canopy are invisible.
-- **Calibrated on three fields; somewhat weaker on new fields.** On 28 out-of-sample fields in 7 regions, 79–81 % of planted patches were found, against 92–100 % on the calibration fields ([details](docs/VALIDATION.md#4-out-of-sample-28-new-fields-across-germany)). Checking or recalibrating for a new region takes one command per season.
-- **A strip sown later looks like poor emergence.** If part of a field was sown or emerged a few weeks later, it follows the same crop curve, only later, and can be flagged as a whole (one test field: 38 % flagged). Such zones are marked `likely_management_difference`; check the field records before scouting them.
-- **Field blocks ≠ fields.** The example boundaries are official Lower Saxony *Feldblöcke*, which can hold several farmers' plots. The crop-unit step separates crops with different seasonal curves. Two plots of the same crop sown at the same time cannot be separated.
-- **Some ground is left unscored:** crop-unit borders, pixels whose crop is uncertain, and unusual-pattern patches. They appear blank or purple on the map, never as Normal.
-- **Cloudy seasons give fewer dates.** Persistence over 6 dates is weaker evidence than over 20, which is why `flagged_dates` is reported per zone. With too few dates the tool refuses to map rather than guess.
+- **Visit a zone before you treat it.** The map shows *where* the crop was weaker, not *why*. Weeds are one possible
+  cause; waterlogging, compaction, nutrients, pests and poor emergence are others.
+- **Check edge zones for headland effects first.** Zones marked "field edge" are often compaction or hedge shade. To
+  leave the headland out, run with `--edge-buffer-m 20`.
+- **A very large zone is often a management difference.** A strip sown a few weeks later can be flagged as a whole.
+  Such zones are marked (`likely_management_difference`); check your field records first.
+- **Small or scattered problems don't show.** Below about 0.25 ha, or weeds scattered under a closed canopy, nothing is
+  visible at 10 m resolution.
+- **More clear images, firmer map.** Every zone says on how many dates it was weaker. With too few images, there is no
+  map rather than a guess.
+
+All known limits in detail: [docs/VALIDATION.md](docs/VALIDATION.md#known-limits).
 
 ## Roadmap
 

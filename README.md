@@ -165,6 +165,7 @@ src/weedscout/
   export.py     COG / GeoJSON / Shapefile / PNG / summary writers
   pipeline.py   one field from boundary to outputs (analyse() is the pure, I/O-free core)
   history.py    multi-year view: recurring zones across seasons, compared with chance
+  cache.py      Sentinel-2 series cached per field and season (.npz, no pickle)
   visit.py      blind field-visit kit and its scoring
   cli.py        the `weedscout` command
 experiments/    calibration, selection rule, repeatability and per-region checks on real data
@@ -241,7 +242,6 @@ The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: th
 - **Field check** of the example zones with the blind visit kit: turns "places to look" into a measured hit rate
   against control points ([#2](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/issues/2), planned next).
 - **More regions and crops** for calibration, especially naturally patchy soils, where detection is weakest.
-- **A safe cache format** for the multi-year view (no pickle files, see [SECURITY.md](SECURITY.md)).
 - **Field Intelligence farm portal:** a web app in development that runs weedscout for a farmer's fields and shows
   the zones, their evidence and the downloads on a map, in German and English.
 - **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed.

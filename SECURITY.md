@@ -31,9 +31,9 @@ This helps to judge what is in scope:
 - It **downloads** public Sentinel-2 imagery from the Microsoft Planetary Computer STAC API over HTTPS. No API key or
   credentials are used or stored.
 - It **writes** results only into the folder given with `--out`. The multi-year view (`--cache`, default
-  `outputs/cache/`) and the validation experiments also cache downloaded imagery there, as Python pickle files.
-  **Only use cache files that weedscout created on your own computer**: loading a pickle file from someone else can
-  run code. (Replacing pickle with a safe format is planned.)
+  `outputs/cache/`) and the validation experiments also cache downloaded imagery there, as NumPy `.npz` files read
+  with `allow_pickle=False`: a cache file holds only numbers and text and cannot run code. Damaged or unexpected cache
+  files are ignored and the imagery is downloaded again.
 
 In scope, for example: a crafted input file that makes weedscout read or write files outside these places, run code,
 or hang/crash in a way a normal malformed file should not. Out of scope: wrong or misleading scouting results (please

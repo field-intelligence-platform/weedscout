@@ -100,9 +100,9 @@ git --version && python3 --version     # must be 3.10–3.13
 
 ## 4. Download the code
 
-> **Contributors (everyone except the team leader):** first create your own **fork** of the repo and clone *that*
-> instead, then connect it to the original. The exact commands are in
-> [CONTRIBUTING.md](CONTRIBUTING.md#as-a-contributor-through-your-fork). Everything else in this guide is the same.
+> **Planning to contribute changes?** Create your own **fork** of the repo first and clone *that* instead (see
+> [CONTRIBUTING.md](CONTRIBUTING.md#making-a-pull-request); team members:
+> [docs/MAINTAINERS.md](docs/MAINTAINERS.md#as-a-contributor-through-your-fork)). Everything else in this guide is the same.
 
 Choose a folder for your projects, for example `C:\Users\<you>\Projects` on Windows or `~/Projects` on
 macOS/Linux:
@@ -257,8 +257,7 @@ pytest -q                              # check everything still works
 **VS Code:** open the project folder (**File → Open Folder**), then **Ctrl+Shift+P → "Python: Select Interpreter"**
 → choose the one in `.venv`. New terminals inside VS Code then activate the venv automatically.
 
-How to make a change and send it to the team (branches, pull requests, reviews) is in
-[CONTRIBUTING.md](CONTRIBUTING.md).
+How to propose a change (fork, pull request, what we check) is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 11. Troubleshooting
 
@@ -274,7 +273,7 @@ How to make a change and send it to the team (branches, pull requests, reviews) 
 | A run fails with **connection / timeout errors** | The Planetary Computer was briefly unreachable. Run the same command again. |
 | **"location information (.prj) is missing"** | A Shapefile was used without its `.prj` file. Export it again with the projection, or zip all its parts together. |
 | Tests fail right after `git pull` | Run `pip install -e ".[dev]"` again (a dependency may have changed). If they still fail on `develop`, tell the team in an issue: that should never happen. |
-| The push is **"refused: open a pull request"** | That's the safety check: you tried to push to `main`. Push your own branch instead (CONTRIBUTING.md). |
+| The push is **"refused: open a pull request"** | That's the safety check: you tried to push to `main`. Push a branch of your fork instead and open a pull request ([CONTRIBUTING.md](CONTRIBUTING.md)). |
 
 Still stuck? Open a Discussion in the repo with the exact command, the full error message and your operating system.
 

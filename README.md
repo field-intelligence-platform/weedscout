@@ -215,7 +215,7 @@ src/weedscout/
   visit.py      blind field-visit kit and its scoring
   cli.py        the `weedscout` command
 experiments/    calibration, selection rule, repeatability and per-region checks on real data
-docs/           VALIDATION.md: what was tested and the results
+docs/           VALIDATION.md: what was tested and the results · MAINTAINERS.md: how the team works
 tests/          offline tests on synthetic fields (no network)
 data/fields/    example boundaries + 28 out-of-sample fields from 7 German states (official field blocks)
 outputs/example/          committed example run, 2024 season

@@ -15,7 +15,7 @@ Fixes #
 
 ## Checklist
 
-- [ ] From my fork into the organisation's `develop` (only releases go into `main`)
+- [ ] Opened from a branch of my fork, as described in CONTRIBUTING.md (team members: into `develop` of the team repo)
 - [ ] `pytest -q` passes locally
 - [ ] New or changed behaviour has tests; a bug fix has a test that failed before
 - [ ] README / docs / examples updated if users see the change

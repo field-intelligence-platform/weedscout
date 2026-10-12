@@ -233,7 +233,7 @@ Each field gets its own folder: `outputs/my_run/<field-id>/`. The most useful fi
 **In QGIS:** drag `scouting_tiers.tif` and `scouting_zones.geojson` into the map window. For a background map:
 **Browser panel → XYZ Tiles → OpenStreetMap** (double-click).
 
-Read the README section **"Limitations — read before using the map"** before drawing conclusions. The map shows
+Read the README section **[Before you use the map](README.md#before-you-use-the-map)** before drawing conclusions. The map shows
 where the crop was persistently weaker. It does not say why, and it does not detect weeds.
 
 ## 10. Every day after that

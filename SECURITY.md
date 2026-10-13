@@ -3,7 +3,7 @@
 ## Supported versions
 
 Security fixes go into the newest release only. Please check that a problem still exists in the
-[latest release](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/releases/latest)
+[latest release](https://github.com/field-intelligence-platform/weedscout/releases/latest)
 before reporting it.
 
 ## Reporting a vulnerability

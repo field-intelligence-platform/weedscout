@@ -37,7 +37,7 @@ body:
     id: version
     attributes:
       label: Branch or version
-      placeholder: e.g. 1.6.0 (from: pip show weedscout) or develop @ 5e991ff
+      placeholder: e.g. 1.6.0 (from: pip show weedscout) or main @ 5e991ff
   - type: textarea
     id: evidence
     attributes:

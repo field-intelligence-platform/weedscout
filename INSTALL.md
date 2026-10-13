@@ -26,7 +26,7 @@ Contents:
 
 | Tool | Version | What for |
 |---|---|---|
-| A GitHub account | with access to the organisation `field-intelligence-platform` | the repo is private |
+| A GitHub account | optional | only to ask questions, report problems or propose changes – downloading needs none |
 | Git | any recent version | downloading the code and sending changes |
 | Python | **3.10, 3.11, 3.12 or 3.13** (3.12 recommended) | running weedscout |
 | QGIS | optional, any recent LTR | looking at the maps weedscout makes |
@@ -37,13 +37,11 @@ Contents:
 
 ## 2. Get access to the repo
 
-1. Make sure you have a GitHub account (https://github.com/signup).
-2. Send your GitHub username to an organisation owner and ask for access to `field-intelligence-platform`.
-3. Accept the invitation: it comes by email, or open https://github.com/field-intelligence-platform and click
-   **Join**.
-4. Check: when you open
-   https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying while logged in,
-   you should see the code. A "404 – page not found" means the invitation is not accepted yet.
+weedscout is public: **you don't need an account or an invitation** to download and use it. The code is at
+https://github.com/field-intelligence-platform/weedscout.
+
+A GitHub account (https://github.com/signup) is only needed to ask questions in Discussions, report a problem, or
+propose a change. Members of the development team: see [docs/MAINTAINERS.md](docs/MAINTAINERS.md).
 
 ## 3. Install the tools
 
@@ -109,24 +107,14 @@ macOS/Linux:
 
 ```bash
 cd C:\Users\<you>\Projects             # macOS/Linux: cd ~/Projects   (create the folder first if needed)
-git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
-cd Precision-Weed-Detection-and-Targeted-Spraying
+git clone https://github.com/field-intelligence-platform/weedscout.git
+cd weedscout
 ```
 
-**The first time you clone**, a window asks you to log in to GitHub. Choose **"Sign in with your browser"** and
-confirm. Git Credential Manager remembers the login, so you only do this once. (On macOS/Linux without a credential
-manager, use an SSH key instead:
-https://docs.github.com/en/authentication/connecting-to-github-with-ssh.)
+No login is needed for this. You get `main`, the released version.
 
-Then switch to the branch we work on, and turn on the safety check that stops accidental pushes to `main`:
-
-```bash
-git switch develop
-git config core.hooksPath .githooks
-```
-
-Also tell git your name and email, if you have never done so on this computer. Use the email of your GitHub
-account, so your commits are linked to you:
+**Only if you plan to propose changes:** tell git your name and email, if you have never done so on this computer.
+Use the email of your GitHub account, so your commits are linked to you:
 
 ```bash
 git config --global user.name "Your Name"
@@ -241,14 +229,13 @@ where the crop was persistently weaker. It does not say why, and it does not det
 Each time you open a new terminal to work on weedscout:
 
 ```bash
-cd C:\Users\<you>\Projects\Precision-Weed-Detection-and-Targeted-Spraying
+cd C:\Users\<you>\Projects\weedscout
 .venv\Scripts\Activate.ps1             # or the command for your terminal (step 5)
 ```
 
-**Getting the newest code** from the team:
+**Getting the newest version:**
 
 ```bash
-git switch develop
 git pull
 pip install -e ".[dev]"                # only needed when pyproject.toml changed; harmless otherwise
 pytest -q                              # check everything still works
@@ -272,13 +259,13 @@ How to propose a change (fork, pull request, what we check) is in [CONTRIBUTING.
 | A run says **"no clear dates"** or few dates | Too cloudy in that season or period. Try another year, or a whole season (`--year`) instead of a short period. |
 | A run fails with **connection / timeout errors** | The Planetary Computer was briefly unreachable. Run the same command again. |
 | **"location information (.prj) is missing"** | A Shapefile was used without its `.prj` file. Export it again with the projection, or zip all its parts together. |
-| Tests fail right after `git pull` | Run `pip install -e ".[dev]"` again (a dependency may have changed). If they still fail on `develop`, tell the team in an issue: that should never happen. |
+| Tests fail right after `git pull` | Run `pip install -e ".[dev]"` again (a dependency may have changed). If they still fail, please open an issue: that should never happen on `main`. |
 | The push is **"refused: open a pull request"** | That's the safety check: you tried to push to `main`. Push a branch of your fork instead and open a pull request ([CONTRIBUTING.md](CONTRIBUTING.md)). |
 
 Still stuck? Open a Discussion in the repo with the exact command, the full error message and your operating system.
 
 ## 12. Remove everything
 
-Everything lives inside the project folder: delete the folder `Precision-Weed-Detection-and-Targeted-Spraying` and
+Everything lives inside the project folder: delete the folder `weedscout` and
 it is gone, including the venv and any image cache. Git, Python and QGIS stay installed for other projects; remove
 them in **Settings → Apps** if you don't need them.

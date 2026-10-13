@@ -3,8 +3,11 @@
 # (see CONTRIBUTING.md). GitHub cannot enforce this on private repos of a free organisation,
 # so this hook does it on each computer. Turn it on once per clone:
 #   git config core.hooksPath .githooks
+# The one exception: the release push of the already merged main to the public repository,
+# done by the maintainer through the remote named "public" (docs/MAINTAINERS.md, releases).
+remote_name="$1"
 while read local_ref local_sha remote_ref remote_sha; do
-  if [ "$remote_ref" = "refs/heads/main" ]; then
+  if [ "$remote_ref" = "refs/heads/main" ] && [ "$remote_name" != "public" ]; then
     echo "Push to main refused: open a pull request from develop instead (CONTRIBUTING.md)." >&2
     exit 1
   fi

@@ -172,7 +172,7 @@ pytest -q                              # runs the offline tests
 The tests take under a minute and need no internet. The last line should look like:
 
 ```
-54 passed, 1 warning in 33.43s
+61 passed, 1 warning in 38.34s
 ```
 
 (The number grows as tests are added. What matters: **no "failed" and no "error"**.)
@@ -250,7 +250,7 @@ How to propose a change (fork, pull request, what we check) is in [CONTRIBUTING.
 
 | Problem | Cause and fix |
 |---|---|
-| `git clone` says **"Repository not found"** or asks for a password again and again | Your account has no access yet (step 2), or you logged in with a different GitHub account. Windows: **Control Panel → Credential Manager → Windows Credentials**, remove the `git:https://github.com` entry, clone again and log in with the right account. |
+| `git clone` says **"Repository not found"** or asks for a password | Check the address: it must be exactly `https://github.com/field-intelligence-platform/weedscout.git` (copy it from step 4). The repo is public, so cloning needs no login. If a login window still appears, cancel it and check the address for typos. |
 | `python` opens the **Microsoft Store** | Python is not on the PATH (step 3), or use `py -3.12 -m venv .venv`. Also: **Settings → Apps → Advanced app settings → App execution aliases** → turn off the two "python" entries. |
 | **"running scripts is disabled"** when activating | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` (step 5), or use Command Prompt / Git Bash. |
 | `weedscout: command not found` / `not recognized` | The venv is not active: the prompt has no `(.venv)`. Activate it (step 5). |

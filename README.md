@@ -1,16 +1,66 @@
 # Precision Weed Scouting — where to look first, from Sentinel-2
 
-[![tests](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml/badge.svg)](https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying/actions/workflows/tests.yml)
+[![tests](https://github.com/field-intelligence-platform/weedscout/actions/workflows/tests.yml/badge.svg)](https://github.com/field-intelligence-platform/weedscout/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/field-intelligence-platform/weedscout)](https://github.com/field-intelligence-platform/weedscout/releases/latest)
+[![licence](https://img.shields.io/badge/licence-Apache--2.0-blue)](LICENSE)
 
-**Version 1.3.0** · Python ≥ 3.10 · free data only (Sentinel-2 via Microsoft Planetary Computer) · status: calibrated, tested out-of-sample on 28 fields across Germany, not yet ground-truthed
+Python ≥ 3.10 · Windows, macOS, Linux · free data only (Sentinel-2 via Microsoft Planetary Computer, no account or API key) · open source
 
 Give it a field-boundary file and a year. It returns a map of the zones that **underperformed the rest of their own crop on most clear-sky dates**, so a farmer, agronomist or drone knows where to walk first.
 
 It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, so individual weeds and most weed patches are not visible from orbit. Low vigour can come from weeds, but equally from waterlogging, compaction, nutrient deficiency, pests or poor emergence. Every output says this, and each zone carries the evidence behind it ("flagged on 8 of 9 clear dates"). Actual weed detection is the job of v2, a segmentation model on drone imagery (see [Roadmap](#roadmap)).
 
+> **Status: tested on satellite data, not yet checked in the field.** The method finds 79–81 % of simulated weak
+> patches on 28 fields across Germany it was never tuned on, flags at most 0.1 % of a field by chance, and its zones are repeatable
+> ([how far it has been tested](#how-far-it-has-been-tested)). Whether the zones it finds are weeds or another problem
+> has **not been checked on the ground yet**. That field check is the next step, and you can help ([see below](#help-us-check-it-in-the-field)).
+> Until then, treat the map as a prioritised list of places to look, not as findings.
+
+| You give it | You get, per field | Time and cost |
+|---|---|---|
+| A boundary file you already have (Shapefile, GeoJSON, KML/KMZ, GPX, GeoPackage) and a year | A scouting map, zones as GeoJSON/Shapefile for farm software, a plain-language summary, and with the visit kit GPS points for a field visit | About 1–2 minutes for a few fields; free |
+
+▶️ **See it in action:** [2-minute demo video](https://github.com/field-intelligence-platform/weedscout/releases/download/v1.6.0/weedscout-demo.mp4) of the Field Intelligence farm portal, which runs weedscout in the browser (German app, German and English captions; [60-second version](https://github.com/field-intelligence-platform/weedscout/releases/download/v1.6.0/weedscout-demo-short.mp4)).
+
 ![Scouting map for a 22.7 ha field block near Göttingen, 2024](outputs/example/DENILI1765120019/quicklook.png)
 
 *Field block DENILI1765120019 near Göttingen, 2024 season. The block holds two crops (U1 winter cereal, U2 summer crop), and each is compared only with itself, in its own growing period. Red marks a persistent low-vigour zone inside a crop. Purple marks pixels whose seasonal curve follows neither crop (including mixed pixels where the two crops meet), so they are shown but not scored. Blank areas inside the field are crop-unit borders and pixels whose crop could not be determined with confidence.*
+
+## Why you can trust what it says – and where it stops
+
+You don't have to take our word for it. Everything below can be checked, and the commands to repeat every test are in
+[docs/VALIDATION.md](docs/VALIDATION.md).
+
+- **Tested against a known answer.** Weak patches were planted into the *real* Sentinel-2 series of real fields, so
+  the right answer was known in advance. On the calibration fields it found **92–100 %** of planted patches of
+  0.25–1 ha that were 10–20 % weaker than their crop (and 96–100 % of those at least 15 % weaker).
+- **Tested on fields it had never seen:** 28 fields in 7 regions of Germany, two seasons: **79–81 %** of the same
+  kind of patches found.
+- **It does not invent zones.** When the data is shuffled so that only chance could line up a zone, it flags at most
+  **0.1 %** of a field.
+- **Its settings were not tuned to look good.** Thresholds were chosen by a fixed rule written down in advance and then
+  checked on new data. Twice, a setting that looked better on the calibration fields was rejected because it
+  over-flagged new ones.
+- **Every zone shows its evidence:** on how many clear dates it was weaker, and by how much ("weaker on 8 of 10 dates,
+  about 12 % below its crop"). A zone with thin evidence looks thin.
+- **It refuses rather than guesses.** With fewer than 3 usable images for a crop, it makes no map and says why.
+
+**Where it stops:** it cannot see individual weeds or patches much smaller than 0.25 ha (10 m pixels), and it cannot
+tell *why* a spot is weak. Whether its zones are weeds, waterlogging, compaction or something else has **not been
+checked in the field yet**. Practical tips: [Before you use the map](#before-you-use-the-map); every known limit in
+detail: [docs/VALIDATION.md](docs/VALIDATION.md#known-limits).
+
+### Help us check it in the field
+
+The one thing satellite tests cannot prove is what the zones *are*. If you farm or advise farmers: run weedscout on a
+field you know well and tell us whether the zones match the places you know, good or bad. The
+[field-visit kit](#field-visit-kit) makes a proper check easy: it adds hidden control points, so a hit rate can be
+compared with chance. Share what you find in [Discussions](https://github.com/field-intelligence-platform/weedscout/discussions).
+
+**Want to try it without installing anything?** The Field Intelligence farm portal, a web app built on weedscout, is
+opening for a small group of testers. [**Request early access**](mailto:gowthamuppalapati21@gmail.com?subject=Field%20Intelligence%20%E2%80%93%20early%20access%20/%20Fr%C3%BCher%20Zugang&body=Name%3A%20%0A%0AI%27d%20like%20to%20test%20the%20Field%20Intelligence%20app%20%28weed%20scouting%29.%20/%20Ich%20m%C3%B6chte%20die%20Field-Intelligence-App%20%28Unkraut-Scouting%29%20testen.%0A%0AMy%20name%20and%20email%20are%20used%20only%20to%20send%20me%20the%20access%20link%20and%20occasional%20updates%20about%20the%20app%3B%20I%20can%20ask%20for%20deletion%20at%20any%20time.%20/%20Name%20und%20E-Mail%20werden%20nur%20f%C3%BCr%20den%20Zugangslink%20und%20gelegentliche%20Neuigkeiten%20zur%20App%20genutzt%3B%20auf%20Wunsch%20werden%20sie%20jederzeit%20gel%C3%B6scht.): an email opens with everything filled in;
+add your name and send it. We use your name and email only to send you the access link and occasional updates, and
+delete them whenever you ask.
 
 ## Example results (3 official field blocks near Göttingen, 2024 season)
 
@@ -65,9 +115,11 @@ Full details and reproduction commands: [docs/VALIDATION.md](docs/VALIDATION.md)
 
 ## Quick start
 
+New to Python or setting up a new computer? [INSTALL.md](INSTALL.md) walks through every step, with troubleshooting.
+
 ```bash
-git clone https://github.com/field-intelligence-platform/Precision-Weed-Detection-and-Targeted-Spraying.git
-cd Precision-Weed-Detection-and-Targeted-Spraying
+git clone https://github.com/field-intelligence-platform/weedscout.git
+cd weedscout
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 
@@ -77,6 +129,17 @@ pytest                                                   # offline tests, no net
 
 No API key is needed: imagery comes from the free [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com/) STAC API. A run over three fields and one season takes one to two minutes. The command above reproduces the committed example in [`outputs/example/`](outputs/example/).
 
+### Using it in the current season
+
+`--year` works for the season that is still running (for example `--year 2026` in July): it uses every clear image so
+far. Two things to know:
+
+- **The map needs enough clear images of each crop.** At least 3 are required, otherwise there is no map for that
+  crop. The more clear dates, the firmer the map: the example fields had 10–21 per crop over the whole 2024 season.
+- **Each crop is scored in its own growing period.** A winter cereal is judged on its spring growth, so its map becomes
+  useful from about early summer; maize grows later, so its map follows in late summer. Running it again later in the
+  season adds the new images.
+
 ### Command-line options
 
 | Option | Default | Meaning |
@@ -85,7 +148,7 @@ No API key is needed: imagery comes from the free [Microsoft Planetary Computer]
 | `--year` | – | **recommended:** the whole growing season of that year (1 March – 31 October). Each crop is scored only in its own growing period, so cereals and maize are both handled in one run |
 | `--start`, `--end` | – | a custom window (`YYYY-MM-DD`) instead of `--year`. Keep it wide: bare-soil and post-harvest dates are what separate crops into units |
 | `--out` | `outputs` | output folder; one sub-folder per field |
-| `--id-column` | auto | attribute holding the field id (auto: `field_id`, `id`, `flik`, `name`) |
+| `--id-column` | auto | attribute holding the field id (auto, first found: `field_id`, `flik`, `name`/`Name`/`NAME`, `id`) |
 | `--min-zone-ha` | `0.1` | smallest zone that is reported |
 | `--edge-buffer-m` | `10` | strip along the field edge left out of the analysis; `20` also leaves out most headland effects |
 | `--max-tile-cloud` | `80` | loose pre-filter on whole-tile cloud cover; the field itself is checked pixel by pixel |
@@ -102,7 +165,11 @@ weedscout-score-visits outputs/my_run/visit_kit     # after the visit
 
 The kit writes one GPS point per zone plus **blind control points** in Normal areas. All points are shuffled and named P01, P02 … so the visitor cannot tell which is which. You get `points.gpx` for a phone GPS app, a `record_sheet.csv` to fill in (weeds none / few / many, other cause, notes, photo), short visit instructions, and a separate answer key. Scoring then reports how often each tier really had a problem **compared with the controls**. A hit rate means nothing without that comparison.
 
-### Multi-year view
+### Multi-year view (optional)
+
+Most of the time you only need the current season. The multi-year view answers one extra question: **does a zone come
+back every year?** A spot that returns season after season (a wet hollow, compaction, a perennial weed like thistle)
+needs a lasting fix rather than a one-off treatment.
 
 ```bash
 weedscout-history --boundary data/fields/goettingen_example_fields.geojson --years 2019-2024 --out outputs/history
@@ -151,10 +218,11 @@ src/weedscout/
   export.py     COG / GeoJSON / Shapefile / PNG / summary writers
   pipeline.py   one field from boundary to outputs (analyse() is the pure, I/O-free core)
   history.py    multi-year view: recurring zones across seasons, compared with chance
+  cache.py      Sentinel-2 series cached per field and season (.npz, no pickle)
   visit.py      blind field-visit kit and its scoring
   cli.py        the `weedscout` command
 experiments/    calibration, selection rule, repeatability and per-region checks on real data
-docs/           VALIDATION.md: what was tested and the results
+docs/           VALIDATION.md: what was tested and the results · MAINTAINERS.md: how the team works
 tests/          offline tests on synthetic fields (no network)
 data/fields/    example boundaries + 28 out-of-sample fields from 7 German states (official field blocks)
 outputs/example/          committed example run, 2024 season
@@ -167,10 +235,10 @@ outputs/history_example/  committed multi-year run, 2019-2024
 |---|---|
 | Shapefile (`.shp` or zipped `.zip`) | needs its `.prj` file; exports from farm-management software work as-is |
 | GeoJSON, GeoPackage | any CRS |
-| KML | e.g. drawn in Google Earth |
+| KML, KMZ | e.g. drawn in Google Earth |
 | GPX | a track or route walked around the field edge is closed into a polygon |
 
-Every feature becomes one field. The id comes from `field_id`, `id`, `flik` or `name` (or `--id-column`). Boundaries are repaired if self-intersecting. Anything over 1,000 ha or under 1 ha is rejected with a plain explanation, because neither can be analysed as one field at 10 m resolution.
+Every feature becomes one field. The id comes from the first of `field_id`, `flik`, `name` (any capitalisation) or `id` that the file has, so a field's name wins over a technical id (or set it with `--id-column`). Boundaries are repaired if self-intersecting. Anything over 1,000 ha or under 1 ha is rejected with a plain explanation, because neither can be analysed as one field at 10 m resolution.
 
 ### Output, per field (`outputs/<run>/<field_id>/`)
 
@@ -209,31 +277,51 @@ Every feature becomes one field. The id comes from `field_id`, `id`, `flik` or `
 
 The thresholds in steps 4 and 5 were **chosen by a fixed rule, not by hand**: the setting that finds the most injected weak patches while keeping chance false alarms ≤ 1 % and every real field ≤ 15 % flagged. They were then checked on 28 fields they had never seen ([docs/VALIDATION.md](docs/VALIDATION.md)). All thresholds are in [`Settings`](src/weedscout/anomaly.py) and [`UnitSettings`](src/weedscout/units.py) and are recorded in every `report.json`.
 
-## Limitations — read before using the map
+## Before you use the map
 
-- **Not ground-truthed.** Nothing here has been checked in the field yet. The calibration measures detection of *synthetic* patches in real data; whether real zones are weeds is unknown until a visit.
-- **Cause is unknown.** The map says *where*, never *why*. Weeds are one possible cause among many. On the example fields most Scout-first zones are headland zones.
-- **Detection floor of about 0.25 ha.** Patches of 0.1 ha or less are not found reliably. Injected test patches were uniform over the season; real problems that vary in strength will be found less often.
-- **Patchy crops hide weaker problems.** On naturally variable fields, such as dry sandy soils, only clearly weak spots stand out. Each summary states this limit per crop.
-- **Weeds are only visible when they change the canopy at 10 m scale**, for example dense patches of grass weeds or thistles over many square metres. Scattered weeds under a closed canopy are invisible.
-- **Calibrated on three fields; somewhat weaker on new fields.** On 28 out-of-sample fields in 7 regions, 79–81 % of planted patches were found, against 92–100 % on the calibration fields ([details](docs/VALIDATION.md#4-out-of-sample-28-new-fields-across-germany)). Checking or recalibrating for a new region takes one command per season.
-- **A strip sown later looks like poor emergence.** If part of a field was sown or emerged a few weeks later, it follows the same crop curve, only later, and can be flagged as a whole (one test field: 38 % flagged). Such zones are marked `likely_management_difference`; check the field records before scouting them.
-- **Field blocks ≠ fields.** The example boundaries are official Lower Saxony *Feldblöcke*, which can hold several farmers' plots. The crop-unit step separates crops with different seasonal curves. Two plots of the same crop sown at the same time cannot be separated.
-- **Some ground is left unscored:** crop-unit borders, pixels whose crop is uncertain, and unusual-pattern patches. They appear blank or purple on the map, never as Normal.
-- **Cloudy seasons give fewer dates.** Persistence over 6 dates is weaker evidence than over 20, which is why `flagged_dates` is reported per zone. With too few dates the tool refuses to map rather than guess.
+- **Visit a zone before you treat it.** The map shows *where* the crop was weaker, not *why*. Weeds are one possible
+  cause; waterlogging, compaction, nutrients, pests and poor emergence are others.
+- **Check edge zones for headland effects first.** Zones marked "field edge" are often compaction or hedge shade. To
+  leave the headland out, run with `--edge-buffer-m 20`.
+- **A very large zone is often a management difference.** A strip sown a few weeks later can be flagged as a whole.
+  Such zones are marked (`likely_management_difference`); check your field records first.
+- **Small or scattered problems don't show.** Below about 0.25 ha, or weeds scattered under a closed canopy, nothing is
+  visible at 10 m resolution.
+- **More clear images, firmer map.** Every zone says on how many dates it was weaker. With too few images, there is no
+  map rather than a guess.
+
+All known limits in detail: [docs/VALIDATION.md](docs/VALIDATION.md#known-limits).
 
 ## Roadmap
 
-- **Ground-truth visit** to the example zones, using the blind visit kit. This turns "suspected" into a measured hit rate against control points.
+- **Field check** with the blind visit kit: turns "places to look" into a measured hit rate against control points.
+  Planned next, and open to anyone who wants to try it on their own fields ([how](#help-us-check-it-in-the-field)).
 - **More regions and crops** for calibration, especially naturally patchy soils, where detection is weakest.
-- **v2 — weed detection on drone imagery:** a U-Net / DeepLabv3 segmentation model trained on WeedMap / CropAndWeed. The scouting map tells the drone where to fly.
-- **Spray-priority dashboard:** FastAPI + MapLibre front-end serving these outputs per field.
+- **Field Intelligence farm portal:** a web app in development that runs weedscout for a farmer's fields and shows
+  the zones, their evidence and the downloads on a map, in German and English.
+- **v2 — weed detection on drone imagery, for the next growing season (2027):** a U-Net / DeepLabv3 segmentation
+  model trained on WeedMap / CropAndWeed.
+  The scouting map tells the drone where to fly.
 
 ## Data and licences
 
 - Sentinel-2 L2A: Copernicus Sentinel data (2019–2024), via Microsoft Planetary Computer.
 - Field boundaries, via [fiboa / Source Cooperative](https://source.coop/fiboa), Daten bearbeitet:
   © ML/SLA Niedersachsen (2024), © Land Brandenburg (2024), © Land Nordrhein-Westfalen (2024), © TLLLR Thüringen (2024), © LfULG Sachsen (2024): [dl-de/by-2-0](https://www.govdata.de/dl-de/by-2-0) · © Land Schleswig-Holstein (2024): [dl-de/zero-2-0](https://www.govdata.de/dl-de/zero-2-0) · © LM Mecklenburg-Vorpommern (2024): no restrictions.
+
+## Feedback and contributing
+
+- **Try the farm portal (web app):** [request early access](mailto:gowthamuppalapati21@gmail.com?subject=Field%20Intelligence%20%E2%80%93%20early%20access%20/%20Fr%C3%BCher%20Zugang&body=Name%3A%20%0A%0AI%27d%20like%20to%20test%20the%20Field%20Intelligence%20app%20%28weed%20scouting%29.%20/%20Ich%20m%C3%B6chte%20die%20Field-Intelligence-App%20%28Unkraut-Scouting%29%20testen.%0A%0AMy%20name%20and%20email%20are%20used%20only%20to%20send%20me%20the%20access%20link%20and%20occasional%20updates%20about%20the%20app%3B%20I%20can%20ask%20for%20deletion%20at%20any%20time.%20/%20Name%20und%20E-Mail%20werden%20nur%20f%C3%BCr%20den%20Zugangslink%20und%20gelegentliche%20Neuigkeiten%20zur%20App%20genutzt%3B%20auf%20Wunsch%20werden%20sie%20jederzeit%20gel%C3%B6scht.).
+- **Questions, ideas, results from your own fields:** [Discussions](https://github.com/field-intelligence-platform/weedscout/discussions).
+  Reports from a field you know, good or bad, are especially welcome (see [Help us check it in the field](#help-us-check-it-in-the-field)).
+- **Something wrong or broken:** open an [issue](https://github.com/field-intelligence-platform/weedscout/issues/new/choose).
+- **A security problem:** please report it privately, see [SECURITY.md](SECURITY.md).
+- **Code or documentation:** contributions are welcome through a fork and a pull request, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## How to cite
+
+If you use weedscout in research or a report, please cite it. GitHub's **"Cite this repository"** button (from
+[CITATION.cff](CITATION.cff)) gives the reference in APA and BibTeX.
 
 ## Licence
 
@@ -242,3 +330,5 @@ Code: Apache License 2.0 – see [LICENSE](LICENSE). The data above keeps its ow
 ## Author
 
 **Gowtham Uppalapati** — M.Sc. Sustainable International Agriculture, University of Göttingen & University of Kassel.
+
+Part of [Field Intelligence Platform](https://github.com/field-intelligence-platform): open tools that turn free satellite data into maps farmers can use.

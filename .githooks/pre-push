@@ -1,0 +1,12 @@
+#!/bin/sh
+# Refuses direct pushes to main. Changes reach main only through a reviewed pull request
+# (see CONTRIBUTING.md). GitHub cannot enforce this on private repos of a free organisation,
+# so this hook does it on each computer. Turn it on once per clone:
+#   git config core.hooksPath .githooks
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "Push to main refused: open a pull request from develop instead (CONTRIBUTING.md)." >&2
+    exit 1
+  fi
+done
+exit 0

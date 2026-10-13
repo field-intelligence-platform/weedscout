@@ -125,6 +125,33 @@ The kit holds one GPS point per zone plus **blind control points** in Normal are
 
 The first calibration used an April–July window. Out-of-sample it found 67–79 % of patches and flagged one field at 40 %. The diagnosis was that the window did not suit late crops: maize fields had as few as 2 usable dates (Münsterland 2024, 23 % recall), and later-sown plots could not be separated. Switching to whole-season analysis with per-crop growing periods raised out-of-sample recall to 79–81 % with less flagging on average. Those first-round tables are kept for reference in `experiments/results*`, `experiments/germany_*` and `experiments/regional_check_aprjul.csv`.
 
+## Known limits
+
+What the tool cannot do, and where its results need care. The README's *Before you use the map* gives the practical
+version.
+
+- **Not checked in the field yet.** All tests use patches planted into real satellite data. Whether real zones are
+  weeds or another problem is unknown until zones are visited (section 6).
+- **The cause is unknown.** The map says *where*, never *why*. On the example fields most Scout-first zones touch the
+  field edge, where headland compaction, hedge shading and turning overlaps are common.
+- **Detection floor of about 0.25 ha.** Patches of 0.1 ha or less are not found reliably (section 1). Planted test
+  patches were equally weak on every date; real problems that vary in strength will be found less often.
+- **Patchy crops hide weaker problems.** On naturally variable fields, such as dry sandy soils, only clearly weak spots
+  stand out (section 4: the Fläming fields). Each summary states this limit per crop.
+- **Weeds are only visible when they change the canopy at 10 m scale**, for example dense patches of grass weeds or
+  thistles over many square metres. Scattered weeds under a closed canopy are invisible.
+- **Somewhat weaker on new fields than on the calibration fields:** 79–81 % instead of 92–100 % of planted patches
+  (section 4). Checking or recalibrating for a new region takes one command per season.
+- **A strip sown later looks like poor emergence.** It follows the same crop curve, only later, and can be flagged as a
+  whole (one test field: 38 % flagged). Such zones are marked `likely_management_difference`.
+- **Field blocks are not always single fields.** The example boundaries are official field blocks, which can hold
+  several farmers' plots. Crops with different seasonal curves are separated; two plots of the same crop sown at the
+  same time are not.
+- **Some ground is left unscored:** crop-unit borders, pixels whose crop is uncertain, and unusual-pattern patches.
+  They appear blank or purple on the map, never as Normal.
+- **Cloudy seasons give fewer dates.** Persistence over 6 dates is weaker evidence than over 20, which is why each zone
+  reports its number of flagged dates. With fewer than 3 usable dates for a crop there is no map.
+
 ## Known limits of this validation
 
 - **Calibrated on three fields, tested on 28 more in 7 regions, over two seasons.** Elsewhere, check or recalibrate with the scripts above.

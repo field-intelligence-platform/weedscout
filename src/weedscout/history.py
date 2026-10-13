@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import pickle
 import sys
 from dataclasses import asdict
 from pathlib import Path
@@ -36,9 +35,10 @@ from shapely.geometry import shape  # noqa: E402
 from . import __version__  # noqa: E402
 from .anomaly import NORMAL, SCOUT_FIRST, WATCH, Settings, ndvi  # noqa: E402
 from .boundary import BoundaryError, Field, read_fields  # noqa: E402
+from .cache import observations as cached_observations  # noqa: E402
 from .export import ATTRIBUTION, write_cog  # noqa: E402
 from .pipeline import analyse, field_mask  # noqa: E402
-from .sentinel import Grid, grid_for, load_observations, search  # noqa: E402
+from .sentinel import Grid, grid_for  # noqa: E402
 from .units import UnitSettings  # noqa: E402
 
 log = logging.getLogger(__name__)
@@ -56,14 +56,7 @@ MIN_SCORED_YEARS = 3
 
 
 def _observations(field: Field, grid: Grid, start: str, end: str, cache: Path | None):
-    path = cache / f"{field.field_id}_{start}_{end}.pkl" if cache else None
-    if path and path.exists():
-        return pickle.loads(path.read_bytes())
-    obs = load_observations(search(field.geometry_wgs84, start, end), grid)
-    if path:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(pickle.dumps(obs))
-    return obs
+    return cached_observations(field, grid, start, end, cache)
 
 
 def chance_recurring_share(p_by_year: list[float]) -> float:

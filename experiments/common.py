@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import pickle
 from pathlib import Path
 
 import numpy as np
@@ -11,7 +10,9 @@ import numpy as np
 from weedscout.anomaly import NORMAL, SCOUT_FIRST, WATCH, ndvi
 from weedscout.boundary import read_fields
 from weedscout.pipeline import field_mask
-from weedscout.sentinel import grid_for, load_observations, search
+from weedscout.cache import cache_path
+from weedscout.cache import observations as cached_observations
+from weedscout.sentinel import grid_for
 from weedscout.zones import clean_tiers
 
 log = logging.getLogger("experiments")
@@ -27,13 +28,9 @@ def load_fields(boundary: Path, start: str, end: str, edge_buffer_m: float = 10.
     for field in read_fields(boundary):
         grid = grid_for(field.geometry, field.crs)
         mask = field_mask(field, grid, edge_buffer_m)
-        path = CACHE / f"{field.field_id}_{start}_{end}.pkl"
-        if path.exists():
-            observations = pickle.loads(path.read_bytes())
-        else:
+        if not cache_path(CACHE, field.field_id, start, end).exists():
             log.info("%s %s..%s: downloading Sentinel-2", field.field_id, start, end)
-            observations = load_observations(search(field.geometry_wgs84, start, end), grid)
-            path.write_bytes(pickle.dumps(observations))
+        observations = cached_observations(field, grid, start, end, CACHE)
         out.append((field, grid, mask, [(o, ndvi(o.red, o.nir)) for o in observations]))
     return out
 

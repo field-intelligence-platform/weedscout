@@ -18,3 +18,6 @@ outputs/*
 
 # Raw experiment tables are large and reproducible (python experiments/calibrate.py)
 experiments/**/*_raw.csv
+
+# Internal instructions for the AI assistant - kept local, never committed
+CLAUDE.md

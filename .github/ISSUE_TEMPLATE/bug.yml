@@ -1,0 +1,45 @@
+name: Bug report
+description: weedscout crashes, refuses a valid file, or gives a wrong result
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please don't attach private field boundaries or farmer names; describe the file instead, or share an anonymised copy.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. weedscout --boundary my_fields.kml --year 2024 --out outputs/run
+        2. See …
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      multiple: true
+      options: [Reading the boundary file, Satellite data download, Crop units, Scouting zones / tiers, Output files, Multi-year view, Field-visit kit, Installation, Other]
+  - type: input
+    id: env
+    attributes:
+      label: Operating system and Python version
+      placeholder: e.g. Windows 11, Python 3.12.10
+  - type: input
+    id: version
+    attributes:
+      label: Branch or version
+      placeholder: e.g. 1.6.0 (from: pip show weedscout) or main @ 5e991ff
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, error messages, logs
+      description: The full terminal output, and summary.md / quicklook.png of the field if the result looks wrong.

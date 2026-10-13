@@ -172,7 +172,7 @@ pip install -e ".[dev]"
   300–500 MB. It takes a few minutes. Ready-made packages exist for Windows, macOS and Linux, so nothing needs to be
   compiled.
 
-The last line should say `Successfully installed … weedscout-1.5.1 …` (or a newer version).
+The last line should say `Successfully installed … weedscout-1.6.0 …` (or a newer version).
 
 ## 7. Check that it works
 

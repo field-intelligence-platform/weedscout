@@ -20,7 +20,7 @@ It is a **scouting map, not a weed detector.** Sentinel-2 pixels are 10 m wide, 
 |---|---|---|
 | A boundary file you already have (Shapefile, GeoJSON, KML/KMZ, GPX, GeoPackage) and a year | A scouting map, zones as GeoJSON/Shapefile for farm software, a plain-language summary, and with the visit kit GPS points for a field visit | About 1–2 minutes for a few fields; free |
 
-▶️ **See it in action:** [2-minute demo video](https://github.com/field-intelligence-platform/weedscout/releases/download/v1.6.0/weedscout-demo.mp4) of the Field Intelligence farm portal, which runs weedscout in the browser (German app, German and English captions; [60-second version](https://github.com/field-intelligence-platform/weedscout/releases/download/v1.6.0/weedscout-demo-short.mp4)).
+▶️ **See it in action:** [2-minute demo video](https://github.com/field-intelligence-platform/weedscout/releases/download/v1.6.0/weedscout-demo.mp4) of the Field Intelligence farm portal, which runs weedscout in the browser (German app, German and English captions).
 
 ![Scouting map for a 22.7 ha field block near Göttingen, 2024](outputs/example/DENILI1765120019/quicklook.png)
 
